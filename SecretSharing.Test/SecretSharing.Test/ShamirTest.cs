@@ -67,7 +67,31 @@ namespace SecretSharing.Test
             Assert.AreNotEqual(k, kPortionOfShares.Count);
             Assert.AreEqual(shares.Count, n);
             Assert.AreNotEqual(secret, reconSecret);
+        }
+        [TestMethod]
+        public void Reconstruct256bitSecretTest()
+        {
+            //arrang
+            var randomAlgorithm = new SimpleRandom();
+            var shamir = new ShamirSecretSharing(randomAlgorithm);
+            var n = 10;
+            var k = 3;
+            var secrets = randomAlgorithm.GetRandomArray(32,0,255);
+            for (int i = 0; i < 32; i++)
+            {
+                //assign
+                var shares = shamir.DivideSecret(secrets[i], k, n);
+
+                var kPortionOfShares = shares.GetRange(0, k);
+
+                var reconSecret = shamir.ReconstructSecret(kPortionOfShares);
+                //assert
+                Assert.AreEqual(k, kPortionOfShares.Count);
+                Assert.AreEqual(shares.Count, n);
+                Assert.AreEqual(secrets[i], reconSecret.Value);
+            }
 
         }
+
     }
 }
