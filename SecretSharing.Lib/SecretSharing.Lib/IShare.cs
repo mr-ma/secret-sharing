@@ -6,7 +6,8 @@ using System.Threading.Tasks;
 
 namespace SecretSharing.Lib
 {
-    public class Class1
+   public  interface IShare
     {
+
     }
 }
