@@ -94,6 +94,20 @@ namespace SecretSharing.FiniteFieldArithmetic
             }
         }
 
+        public FiniteFieldElement Zero
+        {
+            get
+            {
+                return new FiniteFieldElement() { Field = this.Field, Value = 0 };
+            }
+        }
+        public FiniteFieldElement One
+        {
+            get
+            {
+                return new FiniteFieldElement() { Value = 1, Field = this.Field };
+            }
+        }
         #endregion
 
         #region Operator Overloads
@@ -167,8 +181,9 @@ namespace SecretSharing.FiniteFieldArithmetic
         }
 
         #endregion
-    }
 
+        
+    }
     public class Polynomial
     {
         #region Constructor

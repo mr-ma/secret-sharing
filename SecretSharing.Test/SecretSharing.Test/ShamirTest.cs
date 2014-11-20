@@ -17,7 +17,7 @@ namespace SecretSharing.Test
             var shamir = new ShamirSecretSharing(randomAlgorithm);
             var n = 10;
             var k = 3;
-            var secret = 12345;
+            var secret = 2345;
             //assign
             var shares =  shamir.DivideSecret(secret, k, n);
             //assert
@@ -32,7 +32,7 @@ namespace SecretSharing.Test
             var shamir = new ShamirSecretSharing(randomAlgorithm);
             var n = 10;
             var k = 3;
-            var secret = 12345;
+            var secret = 2345;
             //assign
             var shares = shamir.DivideSecret(secret, k, n);
 
@@ -42,7 +42,7 @@ namespace SecretSharing.Test
             //assert
             Assert.AreEqual(k, kPortionOfShares.Count);
             Assert.AreEqual(shares.Count, n);
-            Assert.AreEqual(secret, reconSecret);
+            Assert.AreEqual(secret, reconSecret.Value);
 
         }
 
@@ -54,7 +54,7 @@ namespace SecretSharing.Test
             var shamir = new ShamirSecretSharing(randomAlgorithm);
             var n = 10;
             var k = 3;
-            var secret = 12345;
+            var secret = 2345;
             //assign
     
             var shares = shamir.DivideSecret(secret, k, n);
