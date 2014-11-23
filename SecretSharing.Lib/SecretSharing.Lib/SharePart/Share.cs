@@ -4,10 +4,11 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace SecretSharing.Lib
+namespace SecretSharing.Lib.SharePart
 {
     public class Share:IShare
     {
+
         int x;
 
         public int X

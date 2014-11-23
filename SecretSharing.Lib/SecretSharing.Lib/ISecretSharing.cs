@@ -1,5 +1,6 @@
 ﻿using SecretSharing.FiniteFieldArithmetic;
 using SecretSharing.Lib.Common;
+using SecretSharing.Lib.SharePart;
 using System;
 using System.Collections.Generic;
 using System.Linq;

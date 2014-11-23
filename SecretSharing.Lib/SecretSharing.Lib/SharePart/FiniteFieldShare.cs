@@ -5,7 +5,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace SecretSharing.Lib
+namespace SecretSharing.Lib.SharePart
 {
     public class FiniteFieldShare:IShare
     {

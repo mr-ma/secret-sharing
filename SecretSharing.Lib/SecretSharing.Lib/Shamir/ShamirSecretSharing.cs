@@ -6,6 +6,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using SecretSharing.FiniteFieldArithmetic;
+using SecretSharing.Lib.SharePart;
 
 namespace SecretSharing.Lib.Shamir
 {
@@ -74,6 +75,31 @@ namespace SecretSharing.Lib.Shamir
         public void SetRandomAlgorithm(IRandom Random)
         {
             this.Random = Random;
+        }
+
+        public List<SharePart.ShareCollection> DivideSecret(string secret, int k, int n)
+        {
+            var shares = new List<ShareCollection>();
+            var bytes = Encoding.UTF8.GetBytes(secret);
+            for (int i =0;i<bytes.Length;i++)
+            {
+                var currentLetterShares = DivideSecret(bytes[i], k, n);
+                ShareCollection.ScatterShareIntoCollection(currentLetterShares,ref shares,i);
+            }
+
+            return shares;
+        }
+
+        public string ReconstructSecret(List<SharePart.ShareCollection> shares)
+        {
+            var secret = new Byte[shares[0].Count];
+            for (int i = 0; i < shares[0].Count; i++)
+			{
+                var currentLetterList = ShareCollection.GatherShareFromCollection(shares, i);
+                var currentSecretLetter = ReconstructSecret(currentLetterList);
+                secret[i] = (byte)currentSecretLetter.Value;
+			}
+            return Encoding.UTF8.GetString(secret);
         }
     }
 }

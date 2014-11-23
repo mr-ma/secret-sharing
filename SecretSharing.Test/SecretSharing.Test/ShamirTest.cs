@@ -12,12 +12,12 @@ namespace SecretSharing.Test
         [TestMethod]
         public void DivideSecretTest()
         {
-            //arrang
+            //arrange
             var randomAlgorithm = new SimpleRandom();
             var shamir = new ShamirSecretSharing(randomAlgorithm);
             var n = 10;
             var k = 3;
-            var secret = 2345;
+            var secret = 1234;
             //assign
             var shares =  shamir.DivideSecret(secret, k, n);
             //assert
@@ -27,7 +27,7 @@ namespace SecretSharing.Test
         [TestMethod]
         public void ReconstructSecretTest()
         {
-            //arrang
+            //arrange
             var randomAlgorithm = new SimpleRandom();
             var shamir = new ShamirSecretSharing(randomAlgorithm);
             var n = 10;
@@ -45,11 +45,31 @@ namespace SecretSharing.Test
             Assert.AreEqual(secret, reconSecret.Value);
 
         }
+        [TestMethod]
+        public void ReconstructTextSecretTest()
+        {
+            //arrange
+            var randomAlgorithm = new SimpleRandom();
+            var shamir = new ShamirSecretSharing(randomAlgorithm);
+            var n = 3;
+            var k = 2;
+            var secret = "ABC";
+            //assign
+            var shares = shamir.DivideSecret(secret, k, n);
 
+            var kPortionOfShares = shares.GetRange(0, k);
+
+            var reconSecret = shamir.ReconstructSecret(kPortionOfShares);
+            //assert
+            Assert.AreEqual(k, kPortionOfShares.Count);
+            Assert.AreEqual(shares.Count, n);
+            Assert.AreEqual(secret, reconSecret);
+
+        }
         [TestMethod]
         public void FailToReconstructSecretTest()
         {
-            //arrang
+            //arrange
             var randomAlgorithm = new SimpleRandom();
             var shamir = new ShamirSecretSharing(randomAlgorithm);
             var n = 10;
@@ -71,7 +91,7 @@ namespace SecretSharing.Test
         [TestMethod]
         public void Reconstruct256bitSecretTest()
         {
-            //arrang
+            //arrange
             var randomAlgorithm = new SimpleRandom();
             var shamir = new ShamirSecretSharing(randomAlgorithm);
             var n = 10;

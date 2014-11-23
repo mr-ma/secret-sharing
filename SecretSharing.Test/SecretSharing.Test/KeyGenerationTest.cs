@@ -3,6 +3,7 @@ using Microsoft.VisualStudio.TestTools.UnitTesting;
 using System.Text;
 using System.Security.Cryptography;
 using SecretSharing.FiniteFieldArithmetic;
+using System.Numerics;
 
 namespace SecretSharing.Test
 {
@@ -35,6 +36,14 @@ namespace SecretSharing.Test
         {
             var primes = MathTools.GeneratePrime5(100000000);
             Assert.AreEqual(664579, primes.Count);
+        }
+        [TestMethod]
+        public void TestRandomNumber()
+        {
+            RNGCryptoServiceProvider provider = new RNGCryptoServiceProvider();
+            byte[] rnd=new byte[16];
+            provider.GetBytes(rnd);
+            UInt64 a = BitConverter.ToUInt64(rnd, 0);
         }
     }
 }
