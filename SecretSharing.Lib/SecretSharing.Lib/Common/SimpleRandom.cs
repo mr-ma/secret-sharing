@@ -27,8 +27,19 @@ namespace SecretSharing.Lib.Common
 
         public int GetRandomPrimeNumber()
         {
+            RNGCryptoServiceProvider provider = new RNGCryptoServiceProvider();
+            bool hasAPrime = false;
+            UInt16 a = 0;
+            byte[] rnd = new byte[2];
+            while (!hasAPrime)
+            {
+                provider.GetBytes(rnd);
+                a = BitConverter.ToUInt16(rnd, 0);
+                hasAPrime = SecretSharing.FiniteFieldArithmetic.MathTools.IsPrime(a);
+            }
             //TODO: randomize prime generation
-            return 3299;
+            //return 3299;
+            return a;
         }
     }
 }

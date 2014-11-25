@@ -41,9 +41,17 @@ namespace SecretSharing.Test
         public void TestRandomNumber()
         {
             RNGCryptoServiceProvider provider = new RNGCryptoServiceProvider();
-            byte[] rnd=new byte[16];
-            provider.GetBytes(rnd);
-            UInt64 a = BitConverter.ToUInt64(rnd, 0);
+            bool hasAPrime = false;
+            int a = 0;
+            byte[] rnd = new byte[4];
+            while (!hasAPrime)
+            {
+                provider.GetBytes(rnd);
+                a = BitConverter.ToInt32(rnd, 0);
+                hasAPrime = MathTools.IsPrime(a);
+            }
+
+            Assert.IsTrue(a > 0);
         }
     }
 }
