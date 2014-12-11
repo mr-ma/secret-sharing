@@ -9,7 +9,7 @@ using namespace SecretSharing::Common;
 
 namespace SecretSharing{
 	namespace Shamir{
-		ref class ShamirShare :IShare
+		public ref class ShamirShare :IShare
 		{
 		private:
 			int _x;
@@ -42,7 +42,7 @@ namespace SecretSharing{
 		};
 
 
-		ref class Shamir :ISecretShare{
+		public ref class Shamir :ISecretShare{
 		private:
 			const long primeLength = 18;
 			const long coefficientLength = 59123;
