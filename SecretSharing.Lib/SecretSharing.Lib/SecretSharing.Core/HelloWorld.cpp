@@ -9,7 +9,6 @@ using namespace System;
 using namespace std;
 using namespace NTL;
 using namespace System::Collections::Generic;
-using namespace SecretSharing::Shamir;
 
 int main(array<System::String ^> ^args)
 {

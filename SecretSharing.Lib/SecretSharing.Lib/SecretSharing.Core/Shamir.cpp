@@ -1,8 +1,8 @@
 #include "stdafx.h"
 #include "Shamir.h"
+using namespace System::Collections::Generic;
+using namespace System::Text;
 
-namespace SecretSharing{
-	namespace Shamir{
 		Shamir::Shamir(){
 
 		}
@@ -58,5 +58,30 @@ namespace SecretSharing{
 			conv(secret, secretz);
 			return secret;
 		}
-	}
-}
+		/*
+		List<IShareCollection^>^ Shamir::DivideSecret(int K, int N, String^ Secret){
+			List<ShareCollection^>^ shares = gcnew List<ShareCollection^>();
+
+			array<Byte>^ bytes = Encoding::UTF8->GetBytes(Secret->ToCharArray());
+			for (int i = 0; i<bytes->Length; i++)
+			{
+				List<IShare^>^ currentLetterShares = DivideSecret(K,N, (int)bytes[i]);
+				ShareCollection::ScatterShareIntoCollection(currentLetterShares, shares, i);
+			}
+
+			return shares;
+		}
+		String^ Shamir::ReconstructSecret(List<IShareCollection^>^ shareCollections){
+			int count = shareCollections[0]->GetCount();
+			array<Byte>^ secret = gcnew array<Byte>(count);
+			for (int i = 0; i < count; i++)
+			{
+				List<IShare^>^ currentLetterList = ShareCollection::GatherShareFromCollection(shareCollections, i);
+				int currentSecretLetter = ReconstructSecret(currentLetterList);
+				secret[i] = (Byte)currentSecretLetter;
+			}
+			return Encoding::UTF8->GetString(secret);
+
+		}
+
+*/

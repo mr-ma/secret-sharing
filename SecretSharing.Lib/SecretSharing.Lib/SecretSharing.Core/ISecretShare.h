@@ -1,8 +1,8 @@
 using namespace System;
 using namespace System::Collections::Generic;
-
 namespace SecretSharing{
-	namespace Common{
+	namespace Common
+	{
 		public interface class IShare {
 
 		public:
@@ -16,5 +16,6 @@ namespace SecretSharing{
 			List<IShare^>^ DivideSecret(int K, int N, int Secret);
 			int ReconstructSecret(List<IShare^>^ Shares);
 		};
+
 	}
 }
