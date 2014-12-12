@@ -16,6 +16,7 @@ namespace SecretSharingCore
 			//long GetY(int index);
 			IShare^ GetShare(int index);
 			void SetShare(int index, IShare^ share);
+			String^ ToString();
 			//static void ScatterShareIntoCollection(List<IShare^>^ shares, List<ShareCollection^>^ currentCollection, int index);
 			//List<IShare^>^ GatherShareFromCollection(List<ShareCollection^>^ currentCollection, int i);
 		};
@@ -33,6 +34,7 @@ namespace SecretSharingCore
 			virtual void ShareCollection::SetShare(int index, IShare^ share);
 			static  void ScatterShareIntoCollection(List<IShare^>^ shares, List<IShareCollection^>^ currentCollection, int index);
 			static List<IShare^>^ GatherShareFromCollection(List<IShareCollection^>^ currentCollection, int i);
+			virtual String^ ToString() override;
 			ShareCollection::ShareCollection();
 			ShareCollection::~ShareCollection();
 		};

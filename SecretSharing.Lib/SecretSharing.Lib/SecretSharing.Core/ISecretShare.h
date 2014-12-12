@@ -12,9 +12,10 @@ namespace SecretSharingCore
 		public:
 			int GetX();
 			int GetY();
+			String^ ToString();
 		};
 
-
+		
 		public interface class ISecretShare {
 
 		public:

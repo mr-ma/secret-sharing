@@ -4,42 +4,55 @@
 #include <NTL/ZZ_pXFactoring.h>
 #include "stdafx.h"
 #include "Shamir.h"
+#include "string.h"
 
 using namespace System;
 using namespace std;
 using namespace NTL;
 using namespace System::Collections::Generic;
+using namespace SecretSharingCore::Algorithms;
 
+
+void MarshalString(String ^ s, string& os)
+{
+	using namespace Runtime::InteropServices;
+	const char* chars =
+		(const char*)(Marshal::StringToHGlobalAnsi(s)).ToPointer();
+	os = chars;
+	Marshal::FreeHGlobal(IntPtr((void*)chars));
+}
 int main(array<System::String ^> ^args)
 {
-
 	
-   /* Console::WriteLine(L"Hello World");
-	Console::Read();
-	return 0;
 	int k = 4;
 	int n = 10;
-	int secret = 1234;
+	String^ secret = "1234";
 
 	Shamir^ secretshare = gcnew Shamir();
-	List<IShare^>^ shares= secretshare->DivideSecret(k, n, secret);
+	List<IShareCollection^>^ shares = secretshare->DivideSecret(k, n, secret);
 	
 	
 	for (int i = 0; i < shares->Count; i++)
 	{
-		cout <<i <<" th Share: "<< shares[i]->GetY()<<'\n';
+		IShareCollection^ col = shares[i];
+		Console::WriteLine(col->ToString());
+		for (int j = 0; j < col->GetCount(); j++)
+		{
+			IShare^ share = col->GetShare(j);
+			Console::WriteLine(share->ToString());
+		}
 	}
 
-	List<IShare^>^ frecshares = shares->GetRange(0, k - 1);
-	int frecoveredSecret = secretshare->ReconstructSecret(frecshares);
-	cout << "recovered secret with k-1 shares:"<< frecshares->Count<<"secret:" << frecoveredSecret << '\n';
+
+	List<IShareCollection^>^ frecshares = shares->GetRange(0, k - 1);
+	String^ frecoveredSecret = secretshare ->ReconstructSecret(frecshares);
+	//cout << "recovered secret with k-1 shares:"<< frecshares->Count<<"secret:" << frecoveredSecret << '\n';
 
 
-	List<IShare^>^ recshares = shares->GetRange(0, k);
-	int recoveredSecret = secretshare->ReconstructSecret(recshares);
-	cout << "recovered secret with k shares:" << recshares->Count << "secret:" << recoveredSecret << '\n';
+	List<IShareCollection^>^ recshares = shares->GetRange(0, k);
+	String^ recoveredSecret = secretshare->ReconstructSecret(recshares);
+	cout << "recovered secret with k shares:" << recshares->Count << "secret:" << '\n';
 
-	*/
 	/*
 	int a1 = 166;
 	int a2 = 94;

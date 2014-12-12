@@ -82,7 +82,7 @@ using namespace SecretSharingCore::Algorithms;
 			{
 				List<IShare^>^ currentLetterList = ShareCollection::GatherShareFromCollection(shareCollections, i);
 				int currentSecretLetter = ReconstructSecret(currentLetterList);
-				secret[i] = (Byte)currentSecretLetter;
+				secret[i] = currentSecretLetter;
 			}
 			return Encoding::UTF8->GetString(secret);
 

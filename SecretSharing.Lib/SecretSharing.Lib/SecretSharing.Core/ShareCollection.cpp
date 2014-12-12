@@ -48,3 +48,8 @@ using namespace System::Collections::Generic;
 		shares->Clear();
 	}
 
+
+	String^ ShareCollection::ToString()
+	{
+		return "Test override";
+	}
