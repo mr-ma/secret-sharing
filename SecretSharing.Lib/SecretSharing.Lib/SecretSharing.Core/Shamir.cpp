@@ -1,7 +1,11 @@
+#pragma once
 #include "stdafx.h"
 #include "Shamir.h"
+#include "ShamirShare.h"
 using namespace System::Collections::Generic;
 using namespace System::Text;
+using namespace SecretSharingCore::Common;
+using namespace SecretSharingCore::Algorithms;
 
 		Shamir::Shamir(){
 
@@ -58,9 +62,9 @@ using namespace System::Text;
 			conv(secret, secretz);
 			return secret;
 		}
-		/*
+		
 		List<IShareCollection^>^ Shamir::DivideSecret(int K, int N, String^ Secret){
-			List<ShareCollection^>^ shares = gcnew List<ShareCollection^>();
+			List<IShareCollection^>^ shares = gcnew List<IShareCollection^>();
 
 			array<Byte>^ bytes = Encoding::UTF8->GetBytes(Secret->ToCharArray());
 			for (int i = 0; i<bytes->Length; i++)
@@ -84,4 +88,4 @@ using namespace System::Text;
 
 		}
 
-*/
+

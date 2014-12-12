@@ -8,7 +8,7 @@ namespace SecretSharing.Test
         [TestMethod]
         public void TestDivideSecret()
         {
-            SecretSharing.Shamir.Shamir shamir = new Shamir.Shamir();
+            SecretSharingCore.Algorithms.Shamir shamir = new SecretSharingCore.Algorithms.Shamir();
             var n = 10;
             var k = 3;
             var secret = 1234;
@@ -21,7 +21,7 @@ namespace SecretSharing.Test
         public void ReconstructSecretTest()
         {
             //arrange
-            var shamir = new Shamir.Shamir(); ;
+            var shamir = new SecretSharingCore.Algorithms.Shamir(); ;
             var n = 10;
             var k = 3;
             var secret = 2345;
@@ -39,7 +39,7 @@ namespace SecretSharing.Test
         public void FailReconstructSecretTest()
         {
             //arrange
-            var shamir = new Shamir.Shamir(); ;
+            var shamir = new SecretSharingCore.Algorithms.Shamir(); ;
             var n = 10;
             var k = 3;
             var secret = 2345;

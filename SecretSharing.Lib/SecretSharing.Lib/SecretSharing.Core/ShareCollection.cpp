@@ -1,31 +1,25 @@
+#pragma once
 #include "stdafx.h"
 #include "IShareCollection.h"
-#include "ISecretShare.h"
-#include <stddef.h>
 using namespace System::Collections::Generic;
-using namespace std;
-/*
-public ref class ShareCollection
-{
-private:
-	List<IShare^>^ shares;
 
-public:
+	
+
 	ShareCollection::ShareCollection(){
 		shares = gcnew List<IShare^> ();
 	}
 
-	virtual int GetCount(){
+	int ShareCollection::GetCount(){
 		return shares->Count;
 	}
-	virtual IShare^ GetShare(int index){
+	IShare^ ShareCollection::GetShare(int index){
 		return shares[index];
 	}
-	virtual void SetShare(int index, IShare^ share){
+	void ShareCollection::SetShare(int index, IShare^ share){
 		shares[index] = share;
 	}
 
-	static void ShareCollection::ScatterShareIntoCollection(List<IShare^>^ shares, List<ShareCollection^>^ currentCollection, int index)
+	 void ShareCollection::ScatterShareIntoCollection(List<IShare^>^ shares, List<IShareCollection^>^ currentCollection, int index)
 	{
 		if (currentCollection->Count == 0)
 		{
@@ -41,7 +35,7 @@ public:
 		}
 
 	}
-	static List<IShare^>^ ShareCollection::GatherShareFromCollection(List<ShareCollection^>^ currentCollection, int i)
+	List<IShare^>^ ShareCollection::GatherShareFromCollection(List<IShareCollection^>^ currentCollection, int i)
 	{
 		List<IShare^>^ shares = gcnew List<IShare^>();
 		for (int j = 0; j < currentCollection->Count; j++)
@@ -54,5 +48,3 @@ public:
 		shares->Clear();
 	}
 
-};
-*/

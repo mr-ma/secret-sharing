@@ -16,7 +16,7 @@ int main(array<System::String ^> ^args)
 	
    /* Console::WriteLine(L"Hello World");
 	Console::Read();
-	return 0;*/
+	return 0;
 	int k = 4;
 	int n = 10;
 	int secret = 1234;
@@ -39,7 +39,7 @@ int main(array<System::String ^> ^args)
 	int recoveredSecret = secretshare->ReconstructSecret(recshares);
 	cout << "recovered secret with k shares:" << recshares->Count << "secret:" << recoveredSecret << '\n';
 
-	
+	*/
 	/*
 	int a1 = 166;
 	int a2 = 94;

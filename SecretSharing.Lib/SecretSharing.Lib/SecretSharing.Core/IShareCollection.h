@@ -3,28 +3,38 @@
 
 using namespace System::Collections::Generic;
 using namespace std;
-
+using namespace SecretSharingCore::Common;
+namespace SecretSharingCore
+{
+	namespace Common
+	{
 		public interface class IShareCollection
 		{
 		public:
 			int GetCount();
 			//int GetX(int index);
 			//long GetY(int index);
-			//List<IShare^>^ GetShare(int index);
-			//void SetShare(int index, IShare^ share);
+			IShare^ GetShare(int index);
+			void SetShare(int index, IShare^ share);
 			//static void ScatterShareIntoCollection(List<IShare^>^ shares, List<ShareCollection^>^ currentCollection, int index);
 			//List<IShare^>^ GatherShareFromCollection(List<ShareCollection^>^ currentCollection, int i);
 		};
 
 
 		public ref class ShareCollection :IShareCollection{
+		private:
+
 		public:
-			virtual int GetCount();
+			List<IShare^>^ shares;
+			virtual int ShareCollection::GetCount();
 			//virtual int ShareCollection::GetX(int index);
 			//virtual long ShareCollection::GetY(int index);
-			//virtual List<IShare^>^ GetShare(int index);
-			//virtual void SetShare(int index, IShare^ share);
-			//static  void ScatterShareIntoCollection(List<IShare^>^ shares, List<ShareCollection^>^ currentCollection, int index);
-			//static List<IShare^>^ GatherShareFromCollection(List<ShareCollection^>^ currentCollection, int i);
+			virtual IShare^ ShareCollection::GetShare(int index);
+			virtual void ShareCollection::SetShare(int index, IShare^ share);
+			static  void ScatterShareIntoCollection(List<IShare^>^ shares, List<IShareCollection^>^ currentCollection, int index);
+			static List<IShare^>^ GatherShareFromCollection(List<IShareCollection^>^ currentCollection, int i);
+			ShareCollection::ShareCollection();
+			ShareCollection::~ShareCollection();
 		};
-
+	}
+}

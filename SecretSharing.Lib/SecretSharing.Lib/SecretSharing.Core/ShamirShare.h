@@ -1,7 +1,7 @@
-#include "ISecretShare.h"
 #pragma once
+#include "stdafx.h"
+using namespace SecretSharingCore::Common;
 
-using namespace SecretSharing::Common;
 public ref class ShamirShare :IShare
 {
 private:
