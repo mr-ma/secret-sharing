@@ -46,7 +46,10 @@ namespace SecretSharingCore
 				builder->AppendFormat("X:{0}", GetX());
 				return builder->ToString();
 			}
-
+			ShamirShare::~ShamirShare(){
+				_zz = NULL;
+				delete _zz;
+			}
 		internal:
 			ZZ_p* GetZZ(){
 				return _zz;
