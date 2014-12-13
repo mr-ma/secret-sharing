@@ -13,13 +13,14 @@ namespace SecretSharingCore
 	namespace Algorithms{
 		public ref class Shamir :ISecretShare{
 		private:
-			const long primeLength = 18;
-			const long coefficientLength = 59123;
+			unsigned long prime;
+			long primeLength = 17;
+			const long coefficientLength = 5913;
 		public:
 			Shamir::Shamir();
-			virtual List<IShare^>^ Shamir::DivideSecret(int K, int N, int Secret);
-			virtual int Shamir::ReconstructSecret(List<IShare^>^ Shares);
-
+			virtual List<IShare^>^ Shamir::DivideSecret(int K, int N, long Secret);
+			virtual long Shamir::ReconstructSecret(List<IShare^>^ Shares);
+			virtual long Shamir::GetPrime();
 			List<IShareCollection^>^ Shamir::DivideSecret(int K, int N, String^ Secret);
 			String^ Shamir::ReconstructSecret(List<IShareCollection^>^ shareCollections);
 		};

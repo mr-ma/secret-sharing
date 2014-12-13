@@ -1,12 +1,14 @@
 #pragma once
 #include "stdafx.h"
 using namespace SecretSharingCore::Common;
+using namespace System::Text;
 
 public ref class ShamirShare :IShare
 {
 private:
 	int _x;
-	int _y;
+	unsigned long _y;
+	ZZ_p* zz;
 public:
 	ShamirShare(const ShamirShare% rhs){
 		_x = rhs._x;
@@ -18,18 +20,20 @@ public:
 		return *this;
 	}
 
-	ShamirShare::ShamirShare(int x, int y){
+	ShamirShare::ShamirShare(int x, unsigned long y){
 		_x = x;
 		_y = y;
 	}
 	virtual int GetX(){
 		return _x;
 	}
-	virtual int GetY(){
+	virtual unsigned long GetY(){
 		return _y;
 	}
 	virtual String^ ToString() override
 	{
-		return _x.ToString();
+		StringBuilder^ builder = gcnew StringBuilder();
+		builder->AppendFormat("X:{0}", GetX());
+		return builder->ToString();
 	}
 };

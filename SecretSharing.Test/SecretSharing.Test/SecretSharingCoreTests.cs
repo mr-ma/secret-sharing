@@ -24,16 +24,50 @@ namespace SecretSharing.Test
             var shamir = new SecretSharingCore.Algorithms.Shamir(); ;
             var n = 10;
             var k = 3;
-            var secret = 2345;
+            var secret = 2146985113;
             //assign
-            var shares = shamir.DivideSecret(k,n,secret);
+            var shares = shamir.DivideSecret(k, n, secret);
+
+            //  Assert.IsFalse(shamir.GetPrime() < 0);
+
             var kPortionOfShares = shares.GetRange(0, k);
 
             var reconSecret = shamir.ReconstructSecret(kPortionOfShares);
+            if (secret != reconSecret)
+            {
+                Console.WriteLine(shamir.GetPrime());
+            }
+
             //assert
             Assert.AreEqual(k, kPortionOfShares.Count);
             Assert.AreEqual(shares.Count, n);
             Assert.AreEqual(secret, reconSecret);
+        }
+
+        [TestMethod]
+        public void ReconstructSecretTestRandomAttempt()
+        {
+            //arrange
+            var shamir = new SecretSharingCore.Algorithms.Shamir(); ;
+            var n = 10;
+            var k = 3;
+            var counter = 1000;
+            Random r = new Random();
+            while (counter>0)
+            {
+                counter--;
+                var secret = r.Next();
+                //assign
+                var shares = shamir.DivideSecret(k, n, secret);
+                var kPortionOfShares = shares.GetRange(0, k);
+
+                var reconSecret = shamir.ReconstructSecret(kPortionOfShares);
+                //assert
+                Assert.AreEqual(k, kPortionOfShares.Count);
+                Assert.AreEqual(shares.Count, n);
+                Assert.AreEqual(secret, reconSecret);
+
+            }
         }
         [TestMethod]
         public void FailReconstructSecretTest()

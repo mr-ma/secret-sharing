@@ -46,12 +46,12 @@ int main(array<System::String ^> ^args)
 
 	List<IShareCollection^>^ frecshares = shares->GetRange(0, k - 1);
 	String^ frecoveredSecret = secretshare ->ReconstructSecret(frecshares);
-	//cout << "recovered secret with k-1 shares:"<< frecshares->Count<<"secret:" << frecoveredSecret << '\n';
+	Console::WriteLine("recovered secret with k-1 shares:{0} secret:{1}", frecshares->Count, frecoveredSecret);
 
 
 	List<IShareCollection^>^ recshares = shares->GetRange(0, k);
 	String^ recoveredSecret = secretshare->ReconstructSecret(recshares);
-	cout << "recovered secret with k shares:" << recshares->Count << "secret:" << '\n';
+	Console::WriteLine("recovered secret with k shares:{0} secret:{1}", recshares->Count, recoveredSecret);
 
 	/*
 	int a1 = 166;

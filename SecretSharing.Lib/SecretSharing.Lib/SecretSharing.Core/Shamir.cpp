@@ -6,15 +6,24 @@ using namespace System::Collections::Generic;
 using namespace System::Text;
 using namespace SecretSharingCore::Common;
 using namespace SecretSharingCore::Algorithms;
-
+using namespace NTL;
 		Shamir::Shamir(){
 
 		}
-		List<IShare^>^ Shamir::DivideSecret(int K, int N, int Secret){
+		List<IShare^>^ Shamir::DivideSecret(int K, int N, long Secret){
 
 			//generate prime p
 			ZZ p = GenGermainPrime_ZZ(primeLength);
-			cout << "prime number is:" << p << '\n';
+			//cout << "prime number is:" << p << '\n';
+			while (p < Secret){
+				primeLength++;
+				p = GenGermainPrime_ZZ(primeLength);
+			}
+			
+			
+			unsigned long a;
+			conv(a, p);
+			prime = a;
 
 			ZZ_p::init(p);
 			Vec<ZZ> coefficients = vec_ZZ();
@@ -25,24 +34,25 @@ using namespace SecretSharingCore::Algorithms;
 			for (int i = 1; i < K; i++)
 			{
 				ZZ r = RandomBnd(maxRandom);
-				cout << "random coeff number is:" << r << '\n';
+				//cout << "random coeff number is:" << r << '\n';
 				SetCoeff(f, i, to_ZZ_p(r));
 			}
 
-			cout << "F is:" << f << '\n';
+			//cout << "F is:" << f << '\n';
 			List<IShare^>^ shares = gcnew List<IShare ^>();
 			for (int i = 1; i <= N; i++)
 			{
 				ZZ_p yz = eval(f, ZZ_p(i));
-				long y;
+				unsigned long y;
 				conv(y, yz);
+				if (y < 0 ) throw gcnew Exception(String::Format("Overflow in evaluating polynomial f with x={0}",i));
 				ShamirShare^ sh = gcnew ShamirShare(i, y);
 				shares->Add(sh);
 			}
 
 			return shares;
 		}
-		int Shamir::ReconstructSecret(List<IShare^>^ Shares){
+		long Shamir::ReconstructSecret(List<IShare^>^ Shares){
 			Vec<ZZ_p> y = vec_ZZ_p();
 			Vec<ZZ_p> x = vec_ZZ_p();
 
@@ -58,7 +68,7 @@ using namespace SecretSharingCore::Algorithms;
 			cout << "interpolated f:" << interpolatedf << '\n';
 
 			ZZ_p secretz = eval(interpolatedf, ZZ_p(0));
-			long secret;
+			unsigned long secret;
 			conv(secret, secretz);
 			return secret;
 		}
@@ -88,4 +98,7 @@ using namespace SecretSharingCore::Algorithms;
 
 		}
 
+		long Shamir::GetPrime(){
+			return this->prime;
 
+		}

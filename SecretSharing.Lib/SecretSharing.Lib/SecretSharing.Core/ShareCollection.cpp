@@ -2,7 +2,7 @@
 #include "stdafx.h"
 #include "IShareCollection.h"
 using namespace System::Collections::Generic;
-
+using namespace System::Text;
 	
 
 	ShareCollection::ShareCollection(){
@@ -16,7 +16,7 @@ using namespace System::Collections::Generic;
 		return shares[index];
 	}
 	void ShareCollection::SetShare(int index, IShare^ share){
-		shares[index] = share;
+		shares->Insert( index, share);
 	}
 
 	 void ShareCollection::ScatterShareIntoCollection(List<IShare^>^ shares, List<IShareCollection^>^ currentCollection, int index)
@@ -51,5 +51,14 @@ using namespace System::Collections::Generic;
 
 	String^ ShareCollection::ToString()
 	{
-		return "Test override";
+		StringBuilder^ builder = gcnew StringBuilder();
+		if (this->shares && this->shares->Count > 0){
+			builder->AppendFormat("##Begin ShareCollection length={0}{1}", this->shares->Count, Environment::NewLine);
+			for (int i = 0; i < this->shares->Count; i++)
+			{
+				builder->AppendFormat("index ={0} ,share= {1} {2}", i, shares[i]->ToString(), Environment::NewLine);
+			}
+			builder->AppendFormat("##End ShareCollection {0}", Environment::NewLine);
+		}
+		return builder->ToString();
 	}
