@@ -42,11 +42,12 @@ using namespace NTL;
 			List<IShare^>^ shares = gcnew List<IShare ^>();
 			for (int i = 1; i <= N; i++)
 			{
-				ZZ_p yz = eval(f, ZZ_p(i));
-				unsigned long y;
+				ZZ_p *yz = new ZZ_p(eval(f, ZZ_p(i)));
+				//ZZ_p yz = eval(f, ZZ_p(i));
+		/*		unsigned long y;
 				conv(y, yz);
-				if (y < 0 ) throw gcnew Exception(String::Format("Overflow in evaluating polynomial f with x={0}",i));
-				ShamirShare^ sh = gcnew ShamirShare(i, y);
+				if (y < 0 ) throw gcnew Exception(String::Format("Overflow in evaluating polynomial f with x={0}",i));*/
+				ShamirShare^ sh = gcnew ShamirShare(i, yz);
 				shares->Add(sh);
 			}
 
@@ -59,10 +60,11 @@ using namespace NTL;
 			int count = Shares->Count;
 			for (int i = 0; i < count; i++)
 			{
-				x.append(ZZ_p(Shares[i]->GetX()));
-				ZZ_p yz;
-				conv(yz, Shares[i]->GetY());
-				y.append(yz);
+				ShamirShare^ currentShare = (ShamirShare^) Shares[i];
+				x.append(ZZ_p(currentShare->GetX()));
+			/*	ZZ_p yz;
+				conv(yz, Shares[i]->GetY());*/
+				y.append(*currentShare->GetZZ() );
 			}
 			ZZ_pX interpolatedf = interpolate(x, y);
 			cout << "interpolated f:" << interpolatedf << '\n';

@@ -5,13 +5,13 @@
 #include "stdafx.h"
 #include "Shamir.h"
 #include "string.h"
-
+#include "ShamirShare.h"
 using namespace System;
 using namespace std;
 using namespace NTL;
 using namespace System::Collections::Generic;
 using namespace SecretSharingCore::Algorithms;
-
+using namespace SecretSharingCore::Common;
 
 void MarshalString(String ^ s, string& os)
 {
@@ -24,6 +24,10 @@ void MarshalString(String ^ s, string& os)
 int main(array<System::String ^> ^args)
 {
 	
+
+	IShare^ sharezz = gcnew ShamirShare(1, &ZZ_p(2));
+
+
 	int k = 4;
 	int n = 10;
 	String^ secret = "1234";
