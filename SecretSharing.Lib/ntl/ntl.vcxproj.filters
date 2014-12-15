@@ -18,225 +18,225 @@
     <Text Include="ReadMe.txt" />
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="..\..\..\..\..\..\..\WinNTL-7_0_1\src\c_lip_impl.h">
+    <ClInclude Include="..\WinNTL-7_0_2\src\c_lip_impl.h">
       <Filter>Source Files</Filter>
     </ClInclude>
-    <ClInclude Include="..\..\..\..\..\..\..\WinNTL-7_0_1\src\g_lip_impl.h">
+    <ClInclude Include="..\WinNTL-7_0_2\src\g_lip_impl.h">
       <Filter>Source Files</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
-    <ClCompile Include="..\..\..\..\..\..\..\WinNTL-7_0_1\src\ctools.cpp">
+    <ClCompile Include="..\WinNTL-7_0_2\src\ctools.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="..\..\..\..\..\..\..\WinNTL-7_0_1\src\FacVec.cpp">
+    <ClCompile Include="..\WinNTL-7_0_2\src\FacVec.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="..\..\..\..\..\..\..\WinNTL-7_0_1\src\FFT.cpp">
+    <ClCompile Include="..\WinNTL-7_0_2\src\FFT.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="..\..\..\..\..\..\..\WinNTL-7_0_1\src\fileio.cpp">
+    <ClCompile Include="..\WinNTL-7_0_2\src\fileio.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="..\..\..\..\..\..\..\WinNTL-7_0_1\src\G_LLL_FP.cpp">
+    <ClCompile Include="..\WinNTL-7_0_2\src\G_LLL_FP.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="..\..\..\..\..\..\..\WinNTL-7_0_1\src\G_LLL_QP.cpp">
+    <ClCompile Include="..\WinNTL-7_0_2\src\G_LLL_QP.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="..\..\..\..\..\..\..\WinNTL-7_0_1\src\G_LLL_RR.cpp">
+    <ClCompile Include="..\WinNTL-7_0_2\src\G_LLL_RR.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="..\..\..\..\..\..\..\WinNTL-7_0_1\src\G_LLL_XD.cpp">
+    <ClCompile Include="..\WinNTL-7_0_2\src\G_LLL_XD.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="..\..\..\..\..\..\..\WinNTL-7_0_1\src\GetTime.cpp">
+    <ClCompile Include="..\WinNTL-7_0_2\src\GetTime.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="..\..\..\..\..\..\..\WinNTL-7_0_1\src\GF2.cpp">
+    <ClCompile Include="..\WinNTL-7_0_2\src\GF2.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="..\..\..\..\..\..\..\WinNTL-7_0_1\src\GF2E.cpp">
+    <ClCompile Include="..\WinNTL-7_0_2\src\GF2E.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="..\..\..\..\..\..\..\WinNTL-7_0_1\src\GF2EX.cpp">
+    <ClCompile Include="..\WinNTL-7_0_2\src\GF2EX.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="..\..\..\..\..\..\..\WinNTL-7_0_1\src\GF2EXFactoring.cpp">
+    <ClCompile Include="..\WinNTL-7_0_2\src\GF2EXFactoring.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="..\..\..\..\..\..\..\WinNTL-7_0_1\src\GF2X.cpp">
+    <ClCompile Include="..\WinNTL-7_0_2\src\GF2X.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="..\..\..\..\..\..\..\WinNTL-7_0_1\src\GF2X1.cpp">
+    <ClCompile Include="..\WinNTL-7_0_2\src\GF2X1.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="..\..\..\..\..\..\..\WinNTL-7_0_1\src\GF2XFactoring.cpp">
+    <ClCompile Include="..\WinNTL-7_0_2\src\GF2XFactoring.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="..\..\..\..\..\..\..\WinNTL-7_0_1\src\GF2XVec.cpp">
+    <ClCompile Include="..\WinNTL-7_0_2\src\GF2XVec.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="..\..\..\..\..\..\..\WinNTL-7_0_1\src\HNF.cpp">
+    <ClCompile Include="..\WinNTL-7_0_2\src\HNF.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="..\..\..\..\..\..\..\WinNTL-7_0_1\src\lip.cpp">
+    <ClCompile Include="..\WinNTL-7_0_2\src\lip.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="..\..\..\..\..\..\..\WinNTL-7_0_1\src\LLL.cpp">
+    <ClCompile Include="..\WinNTL-7_0_2\src\LLL.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="..\..\..\..\..\..\..\WinNTL-7_0_1\src\LLL_FP.cpp">
+    <ClCompile Include="..\WinNTL-7_0_2\src\LLL_FP.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="..\..\..\..\..\..\..\WinNTL-7_0_1\src\LLL_QP.cpp">
+    <ClCompile Include="..\WinNTL-7_0_2\src\LLL_QP.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="..\..\..\..\..\..\..\WinNTL-7_0_1\src\LLL_RR.cpp">
+    <ClCompile Include="..\WinNTL-7_0_2\src\LLL_RR.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="..\..\..\..\..\..\..\WinNTL-7_0_1\src\LLL_XD.cpp">
+    <ClCompile Include="..\WinNTL-7_0_2\src\LLL_XD.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="..\..\..\..\..\..\..\WinNTL-7_0_1\src\lzz_p.cpp">
+    <ClCompile Include="..\WinNTL-7_0_2\src\lzz_p.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="..\..\..\..\..\..\..\WinNTL-7_0_1\src\lzz_pE.cpp">
+    <ClCompile Include="..\WinNTL-7_0_2\src\lzz_pE.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="..\..\..\..\..\..\..\WinNTL-7_0_1\src\lzz_pEX.cpp">
+    <ClCompile Include="..\WinNTL-7_0_2\src\lzz_pEX.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="..\..\..\..\..\..\..\WinNTL-7_0_1\src\lzz_pEXFactoring.cpp">
+    <ClCompile Include="..\WinNTL-7_0_2\src\lzz_pEXFactoring.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="..\..\..\..\..\..\..\WinNTL-7_0_1\src\lzz_pX.cpp">
+    <ClCompile Include="..\WinNTL-7_0_2\src\lzz_pX.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="..\..\..\..\..\..\..\WinNTL-7_0_1\src\lzz_pX1.cpp">
+    <ClCompile Include="..\WinNTL-7_0_2\src\lzz_pX1.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="..\..\..\..\..\..\..\WinNTL-7_0_1\src\lzz_pXCharPoly.cpp">
+    <ClCompile Include="..\WinNTL-7_0_2\src\lzz_pXCharPoly.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="..\..\..\..\..\..\..\WinNTL-7_0_1\src\lzz_pXFactoring.cpp">
+    <ClCompile Include="..\WinNTL-7_0_2\src\lzz_pXFactoring.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="..\..\..\..\..\..\..\WinNTL-7_0_1\src\mat_GF2.cpp">
+    <ClCompile Include="..\WinNTL-7_0_2\src\mat_GF2.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="..\..\..\..\..\..\..\WinNTL-7_0_1\src\mat_GF2E.cpp">
+    <ClCompile Include="..\WinNTL-7_0_2\src\mat_GF2E.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="..\..\..\..\..\..\..\WinNTL-7_0_1\src\mat_lzz_p.cpp">
+    <ClCompile Include="..\WinNTL-7_0_2\src\mat_lzz_p.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="..\..\..\..\..\..\..\WinNTL-7_0_1\src\mat_lzz_pE.cpp">
+    <ClCompile Include="..\WinNTL-7_0_2\src\mat_lzz_pE.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="..\..\..\..\..\..\..\WinNTL-7_0_1\src\mat_poly_lzz_p.cpp">
+    <ClCompile Include="..\WinNTL-7_0_2\src\mat_poly_lzz_p.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="..\..\..\..\..\..\..\WinNTL-7_0_1\src\mat_poly_ZZ.cpp">
+    <ClCompile Include="..\WinNTL-7_0_2\src\mat_poly_ZZ.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="..\..\..\..\..\..\..\WinNTL-7_0_1\src\mat_poly_ZZ_p.cpp">
+    <ClCompile Include="..\WinNTL-7_0_2\src\mat_poly_ZZ_p.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="..\..\..\..\..\..\..\WinNTL-7_0_1\src\mat_RR.cpp">
+    <ClCompile Include="..\WinNTL-7_0_2\src\mat_RR.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="..\..\..\..\..\..\..\WinNTL-7_0_1\src\mat_ZZ.cpp">
+    <ClCompile Include="..\WinNTL-7_0_2\src\mat_ZZ.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="..\..\..\..\..\..\..\WinNTL-7_0_1\src\mat_ZZ_p.cpp">
+    <ClCompile Include="..\WinNTL-7_0_2\src\mat_ZZ_p.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="..\..\..\..\..\..\..\WinNTL-7_0_1\src\mat_ZZ_pE.cpp">
+    <ClCompile Include="..\WinNTL-7_0_2\src\mat_ZZ_pE.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="..\..\..\..\..\..\..\WinNTL-7_0_1\src\quad_float.cpp">
+    <ClCompile Include="..\WinNTL-7_0_2\src\quad_float.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="..\..\..\..\..\..\..\WinNTL-7_0_1\src\RR.cpp">
+    <ClCompile Include="..\WinNTL-7_0_2\src\RR.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="..\..\..\..\..\..\..\WinNTL-7_0_1\src\thread.cpp">
+    <ClCompile Include="..\WinNTL-7_0_2\src\thread.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="..\..\..\..\..\..\..\WinNTL-7_0_1\src\tools.cpp">
+    <ClCompile Include="..\WinNTL-7_0_2\src\tools.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="..\..\..\..\..\..\..\WinNTL-7_0_1\src\vec_GF2.cpp">
+    <ClCompile Include="..\WinNTL-7_0_2\src\vec_GF2.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="..\..\..\..\..\..\..\WinNTL-7_0_1\src\vec_GF2E.cpp">
+    <ClCompile Include="..\WinNTL-7_0_2\src\vec_GF2E.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="..\..\..\..\..\..\..\WinNTL-7_0_1\src\vec_lzz_p.cpp">
+    <ClCompile Include="..\WinNTL-7_0_2\src\vec_lzz_p.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="..\..\..\..\..\..\..\WinNTL-7_0_1\src\vec_lzz_pE.cpp">
+    <ClCompile Include="..\WinNTL-7_0_2\src\vec_lzz_pE.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="..\..\..\..\..\..\..\WinNTL-7_0_1\src\vec_RR.cpp">
+    <ClCompile Include="..\WinNTL-7_0_2\src\vec_RR.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="..\..\..\..\..\..\..\WinNTL-7_0_1\src\vec_ZZ.cpp">
+    <ClCompile Include="..\WinNTL-7_0_2\src\vec_ZZ.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="..\..\..\..\..\..\..\WinNTL-7_0_1\src\vec_ZZ_p.cpp">
+    <ClCompile Include="..\WinNTL-7_0_2\src\vec_ZZ_p.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="..\..\..\..\..\..\..\WinNTL-7_0_1\src\vec_ZZ_pE.cpp">
+    <ClCompile Include="..\WinNTL-7_0_2\src\vec_ZZ_pE.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="..\..\..\..\..\..\..\WinNTL-7_0_1\src\WordVector.cpp">
+    <ClCompile Include="..\WinNTL-7_0_2\src\WordVector.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="..\..\..\..\..\..\..\WinNTL-7_0_1\src\xdouble.cpp">
+    <ClCompile Include="..\WinNTL-7_0_2\src\xdouble.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="..\..\..\..\..\..\..\WinNTL-7_0_1\src\ZZ.cpp">
+    <ClCompile Include="..\WinNTL-7_0_2\src\ZZ.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="..\..\..\..\..\..\..\WinNTL-7_0_1\src\ZZ_p.cpp">
+    <ClCompile Include="..\WinNTL-7_0_2\src\ZZ_p.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="..\..\..\..\..\..\..\WinNTL-7_0_1\src\ZZ_pE.cpp">
+    <ClCompile Include="..\WinNTL-7_0_2\src\ZZ_pE.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="..\..\..\..\..\..\..\WinNTL-7_0_1\src\ZZ_pEX.cpp">
+    <ClCompile Include="..\WinNTL-7_0_2\src\ZZ_pEX.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="..\..\..\..\..\..\..\WinNTL-7_0_1\src\ZZ_pEXFactoring.cpp">
+    <ClCompile Include="..\WinNTL-7_0_2\src\ZZ_pEXFactoring.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="..\..\..\..\..\..\..\WinNTL-7_0_1\src\ZZ_pX.cpp">
+    <ClCompile Include="..\WinNTL-7_0_2\src\ZZ_pX.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="..\..\..\..\..\..\..\WinNTL-7_0_1\src\ZZ_pX1.cpp">
+    <ClCompile Include="..\WinNTL-7_0_2\src\ZZ_pX1.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="..\..\..\..\..\..\..\WinNTL-7_0_1\src\ZZ_pXCharPoly.cpp">
+    <ClCompile Include="..\WinNTL-7_0_2\src\ZZ_pXCharPoly.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="..\..\..\..\..\..\..\WinNTL-7_0_1\src\ZZ_pXFactoring.cpp">
+    <ClCompile Include="..\WinNTL-7_0_2\src\ZZ_pXFactoring.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="..\..\..\..\..\..\..\WinNTL-7_0_1\src\ZZVec.cpp">
+    <ClCompile Include="..\WinNTL-7_0_2\src\ZZVec.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="..\..\..\..\..\..\..\WinNTL-7_0_1\src\ZZX.cpp">
+    <ClCompile Include="..\WinNTL-7_0_2\src\ZZX.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="..\..\..\..\..\..\..\WinNTL-7_0_1\src\ZZX1.cpp">
+    <ClCompile Include="..\WinNTL-7_0_2\src\ZZX1.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="..\..\..\..\..\..\..\WinNTL-7_0_1\src\ZZXCharPoly.cpp">
+    <ClCompile Include="..\WinNTL-7_0_2\src\ZZXCharPoly.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="..\..\..\..\..\..\..\WinNTL-7_0_1\src\ZZXFactoring.cpp">
+    <ClCompile Include="..\WinNTL-7_0_2\src\ZZXFactoring.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>
