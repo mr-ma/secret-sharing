@@ -11,8 +11,17 @@ namespace SecretSharing.ProfilerRunner
     {
         static void Main(string[] args)
         {
-            ProfileRunner runner = new ProfileRunner();
-            runner.Run();
+            //ProfileRunner runner = new ProfileRunner();
+            //runner.Run();
+
+            Benchmark.ShamirAntixBenchmark benchmark = new Benchmark.ShamirAntixBenchmark();
+            var re =  benchmark.BenchmarkMe();
+            foreach (var item in re)
+            {
+                Console.WriteLine(item);
+            }
+            Console.ReadLine();
+            System.IO.File.WriteAllLines("benchmarkresults.txt", re);
         }
     }
 }

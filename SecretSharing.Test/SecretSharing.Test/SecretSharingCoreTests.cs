@@ -26,6 +26,15 @@ namespace SecretSharing.Test
             var shares = shamir.DivideSecret(k, n, Secret);
           
         }
+        public void TestDivideSecret(int n)
+        {
+            var k = 5;
+            var Secret = "Test";
+            SecretSharingCore.Algorithms.Shamir shamir = new SecretSharingCore.Algorithms.Shamir();
+            //assign
+            var shares = shamir.DivideSecret(k, n, Secret);
+
+        }
         [TestMethod]
         public void ReconstructSecretTest()
         {
