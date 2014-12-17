@@ -32,17 +32,19 @@ namespace SecretSharing.Benchmark
         {
             var score = new SecretSharingCoreTests();
             List<SecretSharingBenchmarkReport> results = new List<SecretSharingBenchmarkReport>();
-            for (int k = 1; k <= 10; k++)
-			{
-                for (int n = 10; n <= 50; n+=5)
+
+            for (int n = 10; n <= 50; n += 5)
+            {
+                //k can not be bigger than n
+                for (int k = 1; k <= n; k++)
                 {
                     for (int i = 0; i < keys.Length; i++)
-			        {
-			             var re = Antix.Testing.Benchmark.Run(() => score.TestDivideSecret(n,k*5,keys[i]), 10);
-                         results.Add(new SecretSharingBenchmarkReport() { n = n, k = k*5, avg = re.Average, keyLength = keys[i].Length * 8 });
-			        }
+                    {
+                        var re = Antix.Testing.Benchmark.Run(() => score.TestDivideSecret(n, k * 5, keys[i]), 10);
+                        results.Add(new SecretSharingBenchmarkReport() { n = n, k = k * 5, avg = re.Average, keyLength = keys[i].Length * 8 });
+                    }
                 }
-			}
+            }
             var orderedResults = results.OrderBy(po => po.keyLength).ThenBy(po => po.n).ThenBy(po => po.k); 
 
 

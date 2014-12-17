@@ -16,6 +16,7 @@ namespace SecretSharingCore
 			unsigned long prime;
 			long primeLength = 17;
 			const long coefficientLength = 5913;
+			List<IShare^>^ Shamir::DivideSecret(int K, int N, array<Byte>^ Secret, int StartIndex, Byte ChunkSize);
 		public:
 			Shamir::Shamir();
 			virtual List<IShare^>^ Shamir::DivideSecret(int K, int N, long Secret);
@@ -23,6 +24,7 @@ namespace SecretSharingCore
 			virtual long Shamir::GetPrime();
 			List<IShareCollection^>^ Shamir::DivideSecret(int K, int N, String^ Secret);
 			String^ Shamir::ReconstructSecret(List<IShareCollection^>^ shareCollections);
+			List<IShareCollection^>^ Shamir::DivideSecret(int K, int N, array<Byte>^ Secret, Byte ChunkSize);
 		};
 	}
 }

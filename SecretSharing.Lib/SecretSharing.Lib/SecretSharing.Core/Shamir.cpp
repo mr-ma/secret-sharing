@@ -10,6 +10,10 @@ using namespace NTL;
 		Shamir::Shamir(){
 
 		}
+
+
+
+
 		List<IShare^>^ Shamir::DivideSecret(int K, int N, long Secret){
 
 			//generate prime p
@@ -20,10 +24,6 @@ using namespace NTL;
 				p = GenGermainPrime_ZZ(primeLength);
 			}
 			
-			
-			unsigned long a;
-			conv(a, p);
-			prime = a;
 
 			ZZ_p::init(p);
 			Vec<ZZ> coefficients = vec_ZZ();
@@ -53,6 +53,67 @@ using namespace NTL;
 
 			return shares;
 		}
+
+		List<IShare^>^ Shamir::DivideSecret(int K, int N, array<Byte>^ Secret, int StartIndex,Byte ChunkSize)
+		{
+			pin_ptr<unsigned char> unmanagedSecretArray = &Secret[0];
+			//unsigned char* chunk;
+			ZZ chunkSecret = ZZFromBytes(unmanagedSecretArray, ChunkSize);
+
+			//generate prime p
+			ZZ p = GenGermainPrime_ZZ(ChunkSize);
+			//cout << "prime number is:" << p << '\n';
+			while (p < chunkSecret){
+				primeLength++;
+				p = GenGermainPrime_ZZ(primeLength);
+			}
+
+
+			ZZ_p::init(p);
+			Vec<ZZ> coefficients = vec_ZZ();
+			ZZ maxRandom = ZZ(coefficientLength);
+			ZZ_pX f;
+			f.SetLength(K);
+			SetCoeff(f, 0, to_ZZ_p(chunkSecret));
+			for (int i = 1; i < K; i++)
+			{
+				//make sure random coeffcients are smaller than p
+				ZZ r = p;
+				while (r >= p)
+					ZZ r = RandomBnd(maxRandom);
+				SetCoeff(f, i, to_ZZ_p(r));
+			}
+
+			List<IShare^>^ shares = gcnew List<IShare ^>();
+			for (int i = 1; i <= N; i++)
+			{
+				ZZ_p *yz = new ZZ_p(eval(f, ZZ_p(i)));
+				//ZZ_p yz = eval(f, ZZ_p(i));
+				/*		unsigned long y;
+				conv(y, yz);
+				if (y < 0 ) throw gcnew Exception(String::Format("Overflow in evaluating polynomial f with x={0}",i));*/
+				ShamirShare^ sh = gcnew ShamirShare(i, yz);
+				shares->Add(sh);
+			}
+
+			return shares;
+		}
+
+		List<IShareCollection^>^ Shamir::DivideSecret(int K, int N, array<Byte>^ Secret, Byte ChunkSize)
+		{
+			pin_ptr<unsigned char> unmanagedSecretArray = &Secret[0];
+			//unsigned char* chunk;
+			ZZ chunkSecret = ZZFromBytes(unmanagedSecretArray, ChunkSize);
+
+			List<IShareCollection^>^ shares = gcnew List<IShareCollection^>();
+			for (int i = 0; i<Secret->Length; i+=ChunkSize)
+			{
+				List<IShare^>^ currentLetterShares = DivideSecret(K, N, Secret, i, ChunkSize);
+				ShareCollection::ScatterShareIntoCollection(currentLetterShares, shares, i);
+			}
+			return shares;
+		}
+
 		long Shamir::ReconstructSecret(List<IShare^>^ Shares){
 			Vec<ZZ_p> y = vec_ZZ_p();
 			Vec<ZZ_p> x = vec_ZZ_p();
