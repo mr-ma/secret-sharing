@@ -19,6 +19,13 @@ namespace SecretSharing.Test
             //assert
             Assert.AreEqual(shares.Count, n);
         }
+        public void TestDivideSecret(int n,int k,string Secret)
+        {
+            SecretSharingCore.Algorithms.Shamir shamir = new SecretSharingCore.Algorithms.Shamir();
+            //assign
+            var shares = shamir.DivideSecret(k, n, Secret);
+          
+        }
         [TestMethod]
         public void ReconstructSecretTest()
         {
