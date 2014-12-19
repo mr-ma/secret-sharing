@@ -14,6 +14,7 @@ namespace SecretSharingCore
 		};
 		public interface class ISecretShare {
 		public:
+
 			List<IShare^>^ DivideSecret(int K, int N, long Secret);
 			long ReconstructSecret(List<IShare^>^ Shares);
 			long GetPrime();

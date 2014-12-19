@@ -6,7 +6,7 @@ namespace SecretSharingCore
 {
 	namespace Common
 	{
-		public ref class ShamirShare :IShare
+		public ref class ShamirShare :IShare,IDisposable
 		{
 		private:
 			int _x;
@@ -51,7 +51,8 @@ namespace SecretSharingCore
 				builder->AppendFormat("X:{0} y:{1}", GetX(),a);
 				return builder->ToString();
 			}
-			ShamirShare::~ShamirShare(){
+		
+			ShamirShare::!ShamirShare(){
 				_zz = NULL;
 				delete _zz;
 
@@ -65,6 +66,11 @@ namespace SecretSharingCore
 
 			ZZ* GetPrime(){
 				return _prime;
+			}
+		
+		protected:
+			ShamirShare::~ShamirShare(){
+				this->!ShamirShare();
 			}
 		};
 	}

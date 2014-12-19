@@ -56,7 +56,10 @@ void runByteChunkShare(){
 	//String^ recoveredSecretstr = secretshare->ReconstructSecret(recsharesstr);
 
 	Console::WriteLine("Secret:"+Encoding::UTF8->GetString(recoveredSecret));
-
+	for (int i = 0; i < recshares->Count; i++)
+	{
+		delete recshares[i];
+	}
 	//Console::WriteLine("SecretStr:" + recoveredSecretstr);
 }
 
@@ -65,7 +68,7 @@ int main(array<System::String ^> ^args)
 {
 	
 
-	Vec<ZZ_p> y = vec_ZZ_p();
+	/*Vec<ZZ_p> y = vec_ZZ_p();
 	Vec<ZZ_p> x = vec_ZZ_p();
 
 	ZZ_p::init(ZZ(199));
@@ -86,7 +89,7 @@ int main(array<System::String ^> ^args)
 		
 
 	ZZ_pX interpolatedf = interpolate(x, y);
-	cout << "interpol g(x):" << interpolatedf;
+	cout << "interpol g(x):" << interpolatedf;*/
 
 	runByteChunkShare();
 

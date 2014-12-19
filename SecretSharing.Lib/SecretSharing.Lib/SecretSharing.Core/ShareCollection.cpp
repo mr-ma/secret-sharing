@@ -44,8 +44,15 @@ using namespace System::Text;
 		}
 		return shares;
 	}
+	ShareCollection::!ShareCollection(){
+		for (int i = 0; i < shares->Count; i++)
+		{
+			IShare^ sh = shares[i];
+			delete sh;
+		}
+	}
 	ShareCollection::~ShareCollection(){
-		shares->Clear();
+		this->!ShareCollection();
 	}
 
 

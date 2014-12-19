@@ -36,6 +36,8 @@ namespace SecretSharingCore
 			static List<IShare^>^ GatherShareFromCollection(List<IShareCollection^>^ currentCollection, int i);
 			virtual String^ ToString() override;
 			ShareCollection::ShareCollection();
+			ShareCollection::!ShareCollection();
+		protected:
 			ShareCollection::~ShareCollection();
 		};
 	}

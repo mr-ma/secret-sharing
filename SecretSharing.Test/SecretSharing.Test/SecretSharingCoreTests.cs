@@ -44,7 +44,6 @@ namespace SecretSharing.Test
             //assign
             var shares = shamir.DivideSecret(k, n, byteSecret, ChunkSize);
             //assert
-            shares.Clear();
             
         }
 
