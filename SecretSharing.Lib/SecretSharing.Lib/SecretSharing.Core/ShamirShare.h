@@ -12,6 +12,7 @@ namespace SecretSharingCore
 			int _x;
 			unsigned long _y;
 			ZZ_p* _zz;
+			ZZ* _prime;
 		public:
 			ShamirShare(const ShamirShare% rhs){
 				_x = rhs._x;
@@ -27,10 +28,11 @@ namespace SecretSharingCore
 				_x = x;
 				_y = y;
 			}
-			ShamirShare::ShamirShare(int x, ZZ_p* y)
+			ShamirShare::ShamirShare(int x, ZZ_p* y,ZZ* prime)
 			{
 				_x = x;
 				_zz = y;
+				_prime = prime;
 			}
 
 			virtual int GetX(){
@@ -40,10 +42,13 @@ namespace SecretSharingCore
 			virtual unsigned long GetY(){
 				return _y;
 			}
+
 			virtual String^ ToString() override
 			{
+				long a;
+				conv(a, *_zz);
 				StringBuilder^ builder = gcnew StringBuilder();
-				builder->AppendFormat("X:{0}", GetX());
+				builder->AppendFormat("X:{0} y:{1}", GetX(),a);
 				return builder->ToString();
 			}
 			ShamirShare::~ShamirShare(){
@@ -53,6 +58,10 @@ namespace SecretSharingCore
 		internal:
 			ZZ_p* GetZZ(){
 				return _zz;
+			}
+
+			ZZ* GetPrime(){
+				return _prime;
 			}
 		};
 	}

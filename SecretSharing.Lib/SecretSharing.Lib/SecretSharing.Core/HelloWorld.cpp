@@ -21,16 +21,83 @@ void MarshalString(String ^ s, string& os)
 	os = chars;
 	Marshal::FreeHGlobal(IntPtr((void*)chars));
 }
+
+
+void runByteChunkShare(){
+	int k = 3;
+	int n = 10;
+	Byte chunkSize = 16;
+	String^ secret = "1234567812345678";
+	array<Byte>^ bytes = Encoding::UTF8->GetBytes(secret->ToCharArray());
+	Shamir^ secretshare = gcnew Shamir();
+	List<IShareCollection^>^ shares = secretshare->DivideSecret(k, n, bytes,chunkSize);
+	//List<IShareCollection^>^ sharesStr = secretshare->DivideSecret(k, n,secret);
+
+	for (int i = 0; i < k; i++)
+	{
+		IShareCollection^ col = shares[i];
+		//IShareCollection^ colstr = sharesStr[i];
+
+		Console::WriteLine(col->ToString());
+		//Console::WriteLine(colstr->ToString()); 
+
+	/*	for (int j = 0; j < col->GetCount(); j++)
+		{
+			IShare^ share = col->GetShare(j);
+			IShare^ shareStr = colstr->GetShare(j);
+			Console::WriteLine(share->ToString());
+			Console::WriteLine(shareStr->ToString());
+		}*/
+	}
+
+	List<IShareCollection^>^ recshares = shares->GetRange(0, k);
+	array<Byte>^ recoveredSecret = secretshare->ReconstructSecret(recshares, chunkSize);
+	//List<IShareCollection^>^ recsharesstr = sharesStr->GetRange(0, k);
+	//String^ recoveredSecretstr = secretshare->ReconstructSecret(recsharesstr);
+
+	Console::WriteLine("Secret:"+Encoding::UTF8->GetString(recoveredSecret));
+
+	//Console::WriteLine("SecretStr:" + recoveredSecretstr);
+}
+
+
 int main(array<System::String ^> ^args)
 {
 	
 
-	IShare^ sharezz = gcnew ShamirShare(1, &ZZ_p(2));
+	Vec<ZZ_p> y = vec_ZZ_p();
+	Vec<ZZ_p> x = vec_ZZ_p();
+
+	ZZ_p::init(ZZ(199));
+	ZZ_p y1 = ZZ_p(68);
+	ZZ_p y2 = ZZ_p(2);
+	ZZ_p y3 = ZZ_p(92);
 
 
+
+		x.append(ZZ_p(1));
+		x.append(ZZ_p(2));
+		x.append(ZZ_p(3));
+
+
+		y.append(y1);
+		y.append(y2);
+		y.append(y3);
+		
+
+	ZZ_pX interpolatedf = interpolate(x, y);
+	cout << "interpol g(x):" << interpolatedf;
+
+	runByteChunkShare();
+
+	//IShare^ sharezz = gcnew ShamirShare(1, &ZZ_p(2));
+
+	/*
 	int k = 4;
 	int n = 10;
 	String^ secret = "1234";
+
+
 
 	Shamir^ secretshare = gcnew Shamir();
 	List<IShareCollection^>^ shares = secretshare->DivideSecret(k, n, secret);
@@ -55,7 +122,7 @@ int main(array<System::String ^> ^args)
 
 	List<IShareCollection^>^ recshares = shares->GetRange(0, k);
 	String^ recoveredSecret = secretshare->ReconstructSecret(recshares);
-	Console::WriteLine("recovered secret with k shares:{0} secret:{1}", recshares->Count, recoveredSecret);
+	Console::WriteLine("recovered secret with k shares:{0} secret:{1}", recshares->Count, recoveredSecret);*/
 
 	/*
 	int a1 = 166;
@@ -113,6 +180,5 @@ int main(array<System::String ^> ^args)
 	CanZass(factors, f);  // calls "Cantor/Zassenhaus" algorithm
 
 	cout << factors << "\n";
-	*/
-	Console::Read();
+	*/	Console::Read();
 }

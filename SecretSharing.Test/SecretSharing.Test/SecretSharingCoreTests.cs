@@ -2,6 +2,7 @@
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 using SecretSharingCore.Common;
 using SecretSharing.Lib.Common;
+using System.Text;
 namespace SecretSharing.Test
 {
     [TestClass]
@@ -19,6 +20,25 @@ namespace SecretSharing.Test
             //assert
             Assert.AreEqual(shares.Count, n);
         }
+
+        [TestMethod]
+        public void TestDivideSecretWithChunkSize()
+        {
+            SecretSharingCore.Algorithms.Shamir shamir = new SecretSharingCore.Algorithms.Shamir();
+            var n = 10;
+            var k = 3;
+            var secret = "1234567890";
+            var byteSecret = Encoding.UTF8.GetBytes(secret.ToCharArray());
+            byte chunkSize = 8;
+            //assign
+            var shares = shamir.DivideSecret(k, n, byteSecret,chunkSize);
+            //assert
+            Assert.AreEqual(shares.Count, n);
+        }
+
+
+
+
         public void TestDivideSecret(int n,int k,string Secret)
         {
             SecretSharingCore.Algorithms.Shamir shamir = new SecretSharingCore.Algorithms.Shamir();
