@@ -15,13 +15,14 @@ namespace SecretSharing.ProfilerRunner
             //runner.Run();
 
             Benchmark.ShamirAntixBenchmark benchmark = new Benchmark.ShamirAntixBenchmark();
-            var re =  benchmark.BenchmarkMe();
-            foreach (var item in re)
-            {
-                Console.WriteLine(item);
-            }
+            //var re =  benchmark.BenchmarkMeWithChunkSize();
+            //foreach (var item in re)
+            //{
+            //    Console.WriteLine(item);
+            //}
+            benchmark.BenchmarkMeWithChunkSizeFixedParameters();
             Console.ReadLine();
-            System.IO.File.WriteAllLines("benchmarkresults.txt", re);
+            //System.IO.File.WriteAllLines("benchmarkresultsNew.txt", re);
         }
     }
 }

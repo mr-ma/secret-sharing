@@ -37,6 +37,17 @@ namespace SecretSharing.Test
         }
 
 
+        public void TestDivideSecretWithChunkSize(int n, int k, byte ChunkSize,String Secret)
+        {
+            SecretSharingCore.Algorithms.Shamir shamir = new SecretSharingCore.Algorithms.Shamir();
+            var byteSecret = Encoding.UTF8.GetBytes(Secret.ToCharArray());
+            //assign
+            var shares = shamir.DivideSecret(k, n, byteSecret, ChunkSize);
+            //assert
+            shares.Clear();
+            
+        }
+
 
 
         public void TestDivideSecret(int n,int k,string Secret)

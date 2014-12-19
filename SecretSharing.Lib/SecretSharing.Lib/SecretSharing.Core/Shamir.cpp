@@ -200,7 +200,8 @@ using namespace NTL;
 			BytesFromZZ(unmanagedSecretArray, to_ZZ( secretz._ZZ_p__rep), ChunkSize);
 			array<Byte>^ _Data = gcnew array<Byte>(ChunkSize);
 			System::Runtime::InteropServices::Marshal::Copy(IntPtr((void *)unmanagedSecretArray), _Data, 0, ChunkSize);
-
+			
+			delete unmanagedSecretArray;
 			return _Data;
 		}
 		array<Byte>^  Shamir::ReconstructSecret(List<IShareCollection^>^ shareCollections,Byte ChunkSize){

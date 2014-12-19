@@ -54,6 +54,9 @@ namespace SecretSharingCore
 			ShamirShare::~ShamirShare(){
 				_zz = NULL;
 				delete _zz;
+
+				_prime = NULL;
+				delete _prime;
 			}
 		internal:
 			ZZ_p* GetZZ(){
