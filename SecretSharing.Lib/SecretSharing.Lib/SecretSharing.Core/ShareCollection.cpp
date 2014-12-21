@@ -50,6 +50,7 @@ using namespace System::Text;
 			IShare^ sh = shares[i];
 			delete sh;
 		}
+		shares->Clear();
 	}
 	ShareCollection::~ShareCollection(){
 		this->!ShareCollection();

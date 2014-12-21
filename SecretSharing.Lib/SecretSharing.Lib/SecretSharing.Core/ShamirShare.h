@@ -6,7 +6,7 @@ namespace SecretSharingCore
 {
 	namespace Common
 	{
-		public ref class ShamirShare :IShare,IDisposable
+		public ref class ShamirShare :IShare
 		{
 		private:
 			int _x;

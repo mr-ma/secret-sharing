@@ -61,19 +61,19 @@ using namespace NTL;
 			ZZ chunkSecret = ZZFromBytes(unmanagedSecretArray, ChunkSize);
 			//delete unmanagedSecretArray;
 
-			cout << "chunkSecret:"<<chunkSecret<<'\n';
+			//cout << "chunkSecret:"<<chunkSecret<<'\n';
 
 			//generate prime p
 			ZZ p;
 			RandomPrime(p,ChunkSize*8);
 
-			cout << "prime:" << p << '\n';
+			//cout << "prime:" << p << '\n';
 			//cout << "prime number is:" << p << '\n';
 			while (p < chunkSecret){
 				RandomPrime(p, ChunkSize * 8);
 	/*			primeLength++;
 				p = GenGermainPrime_ZZ(primeLength);*/
-				cout << "prime:" << p << '\n';
+			//	cout << "prime:" << p << '\n';
 			}
 
 
@@ -95,7 +95,7 @@ using namespace NTL;
 				}
 				SetCoeff(f, i, to_ZZ_p(r));
 			}
-			cout <<"g(x):"<< f;
+			//cout <<"g(x):"<< f;
 
 			ZZ* primePtr = new ZZ(p);
 			List<IShare^>^ shares = gcnew List<IShare ^>();
@@ -104,7 +104,7 @@ using namespace NTL;
 				
 				ZZ_p *yz = new ZZ_p(eval(f, ZZ_p(i)));
 
-				cout<<'\n' <<"yz:"<<*yz<<'\n';
+				//cout<<'\n' <<"yz:"<<*yz<<'\n';
 				//ZZ_p yz = eval(f, ZZ_p(i));
 				/*		unsigned long y;
 				conv(y, yz);
@@ -178,16 +178,16 @@ using namespace NTL;
 				x.append(ZZ_p(currentShare->GetX()));
 				y.append(*currentShare->GetZZ());
 
-				cout << '\n' << "interpolat val x,y :" << ZZ_p(currentShare->GetX()) << ',' << *currentShare->GetZZ() << '\n';
+				//cout << '\n' << "interpolat val x,y :" << ZZ_p(currentShare->GetX()) << ',' << *currentShare->GetZZ() << '\n';
 			}
 
 			ZZ_pX interpolatedf = interpolate(x, y);
-			cout << "interpol g(x):" << interpolatedf;
+			//cout << "interpol g(x):" << interpolatedf;
 
 
 			ZZ_p secretz = eval(interpolatedf, ZZ_p(0));
 
-			cout << "reconChunkSecret:" << secretz << '\n';
+			//cout << "reconChunkSecret:" << secretz << '\n';
 
 			return secretz;
 		}
@@ -213,8 +213,15 @@ using namespace NTL;
 				array<Byte>^ currentSecretLetter = ReconstructSecret(currentLetterList, ChunkSize);
 				currentSecretLetter->CopyTo(secret, i*ChunkSize);
 			}
-			return secret;
-
+			List<Byte>^ nonEmptyBytes = gcnew List<Byte>  ();
+			//remove empty bytes
+			for (int i = 0;i< secret->Length; i++)
+			{
+				if (secret[i] != '\0') nonEmptyBytes->Add(secret[i]);
+				else break;
+			}
+			return nonEmptyBytes->ToArray();
+			
 		}
 
 		long Shamir::GetPrime(){

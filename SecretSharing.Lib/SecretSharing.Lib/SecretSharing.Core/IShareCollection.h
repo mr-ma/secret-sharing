@@ -8,7 +8,7 @@ namespace SecretSharingCore
 {
 	namespace Common
 	{
-		public interface class IShareCollection
+		public interface class IShareCollection: IDisposable
 		{
 		public:
 			int GetCount();

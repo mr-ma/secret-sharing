@@ -3,6 +3,7 @@ using Microsoft.VisualStudio.TestTools.UnitTesting;
 using SecretSharingCore.Common;
 using SecretSharing.Lib.Common;
 using System.Text;
+using System.Collections.Generic;
 namespace SecretSharing.Test
 {
     [TestClass]
@@ -35,14 +36,29 @@ namespace SecretSharing.Test
             //assert
             Assert.AreEqual(shares.Count, n);
         }
+        [TestMethod]
+        public void TestReconstructSecretWithChunkSize()
+        {
+            SecretSharingCore.Algorithms.Shamir shamir = new SecretSharingCore.Algorithms.Shamir();
+            var n = 10;
+            var k = 3;
+            var secret = "1234567890";
+            var byteSecret = Encoding.UTF8.GetBytes(secret.ToCharArray());
+            byte chunkSize = 8;
+            //assign
+            var shares = shamir.DivideSecret(k, n, byteSecret, chunkSize);
+            var reconSecret = Encoding.UTF8.GetString( shamir.ReconstructSecret(shares, chunkSize));
+            //assert
+            Assert.AreEqual(shares.Count, n);
+            Assert.AreEqual(secret, reconSecret);
+        }
 
-
-        public void TestDivideSecretWithChunkSize(int n, int k, byte ChunkSize,String Secret)
+        public List<IShareCollection> TestDivideSecretWithChunkSize(int n, int k, byte ChunkSize,String Secret)
         {
             SecretSharingCore.Algorithms.Shamir shamir = new SecretSharingCore.Algorithms.Shamir();
             var byteSecret = Encoding.UTF8.GetBytes(Secret.ToCharArray());
             //assign
-            var shares = shamir.DivideSecret(k, n, byteSecret, ChunkSize);
+            return shamir.DivideSecret(k, n, byteSecret, ChunkSize);
             //assert
             
         }
@@ -211,6 +227,15 @@ namespace SecretSharing.Test
                 Assert.AreEqual(secrets[i], reconSecret);
             }
 
+        }
+
+
+        public void TestReconstructSecretWithChunkSize(List<IShareCollection> shares, byte chunkSize)
+        {
+            SecretSharingCore.Algorithms.Shamir shamir = new SecretSharingCore.Algorithms.Shamir();
+            //assign
+            var reconSecret = Encoding.UTF8.GetString(shamir.ReconstructSecret(shares, chunkSize));
+           
         }
     }
 }

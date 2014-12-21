@@ -6,7 +6,7 @@ namespace SecretSharingCore
 {
 	namespace Common
 	{
-		public interface class IShare {
+		public interface class IShare : IDisposable {
 		public:
 			int GetX();
 			unsigned long GetY();
