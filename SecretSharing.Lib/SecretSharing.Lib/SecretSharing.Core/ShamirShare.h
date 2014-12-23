@@ -1,5 +1,6 @@
 #pragma once
 #include "stdafx.h"
+#include "NativePtr.h"
 using namespace SecretSharingCore::Common;
 using namespace System::Text;
 namespace SecretSharingCore
@@ -11,8 +12,8 @@ namespace SecretSharingCore
 		private:
 			int _x;
 			unsigned long _y;
-			ZZ_p* _zz;
-			ZZ* _prime;
+			CAutoNativePtr< ZZ_p> _zz;
+			CAutoNativePtr<ZZ> _prime;
 		public:
 			ShamirShare(const ShamirShare% rhs){
 				_x = rhs._x;
@@ -53,11 +54,11 @@ namespace SecretSharingCore
 			}
 		
 			ShamirShare::!ShamirShare(){
-				_zz = NULL;
+				/*_zz = NULL;
 				delete _zz;
 
 				_prime = NULL;
-				delete _prime;
+				delete _prime;*/
 			}
 		internal:
 			ZZ_p* GetZZ(){

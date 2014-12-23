@@ -1,11 +1,14 @@
 // HelloWorld.cpp : main project file.
-
+#define _CRTDBG_MAP_ALLOC
+#include <stdlib.h>
+#include <crtdbg.h>
 #include "stdafx.h"
 #include <NTL/ZZ_pXFactoring.h>
 #include "stdafx.h"
 #include "Shamir.h"
 #include "string.h"
 #include "ShamirShare.h"
+#include "vld.h"
 using namespace System;
 using namespace std;
 using namespace NTL;
@@ -32,7 +35,7 @@ void runByteChunkShare(){
 	Shamir^ secretshare = gcnew Shamir();
 	List<IShareCollection^>^ shares = secretshare->DivideSecret(k, n, bytes,chunkSize);
 	//List<IShareCollection^>^ sharesStr = secretshare->DivideSecret(k, n,secret);
-
+	delete bytes;
 	for (int i = 0; i < k; i++)
 	{
 		IShareCollection^ col = shares[i];
@@ -66,7 +69,7 @@ void runByteChunkShare(){
 
 int main(array<System::String ^> ^args)
 {
-	
+	_CrtSetReportMode(_CRT_ERROR, _CRTDBG_MODE_DEBUG);
 
 	/*Vec<ZZ_p> y = vec_ZZ_p();
 	Vec<ZZ_p> x = vec_ZZ_p();
@@ -183,5 +186,6 @@ int main(array<System::String ^> ^args)
 	CanZass(factors, f);  // calls "Cantor/Zassenhaus" algorithm
 
 	cout << factors << "\n";
-	*/	Console::Read();
+	*/	_CrtDumpMemoryLeaks(); 
+	Console::Read();
 }

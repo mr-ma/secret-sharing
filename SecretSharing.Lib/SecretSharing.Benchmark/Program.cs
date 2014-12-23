@@ -20,22 +20,22 @@ namespace SecretSharing.Benchmark
        
 
             ShamirAntixBenchmark benchmark = new ShamirAntixBenchmark();
-            var reports = benchmark.BenchmarkMeWithChunkSize(chunkSize, 50, 50, 5,SecretSharingBenchmarkReport.OperationType.ShareGeneration,benchmark.key256bit, 10);
-            var floatchunkreports = benchmark.BenchmarkMeWithChunkFloatSize(50, 50, 5, SecretSharingBenchmarkReport.OperationType.ShareGeneration, benchmark.key256bit, 10);
+            var reports = benchmark.BenchmarkMeWithChunkSize(chunkSize, 50, 50, 5,SecretSharingBenchmarkReport.OperationType.SecretReconstruction,benchmark.key256bit, 10);
+            //var floatchunkreports = benchmark.BenchmarkMeWithChunkFloatSize(50, 50, 5, SecretSharingBenchmarkReport.OperationType.SecretReconstruction, benchmark.key256bit, 10);
             
             
             var filteredrep = reports.Where(po => po.chunkSize == 8);
 
             PDFGenerator pdfreport = new PDFGenerator();
-            pdfreport.GenBenchmarkDoc("256bit_n50_k50_chunk64bit.pdf", filteredrep);
+            pdfreport.GenBenchmarkDoc("256bit_n50_k50_recon_chunk64bit.pdf", filteredrep);
 
             filteredrep = reports.Where(po => po.chunkSize == 4);
-            pdfreport.GenBenchmarkDoc("256bit_n50_k50_chunk32bit.pdf", filteredrep);
+            pdfreport.GenBenchmarkDoc("256bit_n50_k50_recon_chunk32bit.pdf", filteredrep);
 
             filteredrep = reports.Where(po => po.chunkSize == 1);
-            pdfreport.GenBenchmarkDoc("256bit_n50_k50_chunk8bit.pdf", filteredrep);
+            pdfreport.GenBenchmarkDoc("256bit_n50_k50_recon_chunk8bit.pdf", filteredrep);
 
-            pdfreport.GenBenchmarkDoc("256bit_n50_k50_floatchunk.pdf", floatchunkreports);
+            //pdfreport.GenBenchmarkDoc("256bit_n50_k50_recon_floatchunk.pdf", floatchunkreports);
             //benchmark.BenchmarkMeWithChunkSize(chunkSize, MaxN, MaxK, step, "AllResults100N_100K", 10);
 
 

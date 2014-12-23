@@ -40,14 +40,16 @@ using namespace NTL;
 
 			//cout << "F is:" << f << '\n';
 			List<IShare^>^ shares = gcnew List<IShare ^>();
+			
 			for (int i = 1; i <= N; i++)
 			{
+				ZZ *primeOfShare = new ZZ(p);
 				ZZ_p *yz = new ZZ_p(eval(f, ZZ_p(i)));
 				//ZZ_p yz = eval(f, ZZ_p(i));
 		/*		unsigned long y;
 				conv(y, yz);
 				if (y < 0 ) throw gcnew Exception(String::Format("Overflow in evaluating polynomial f with x={0}",i));*/
-				ShamirShare^ sh = gcnew ShamirShare(i, yz, &p);
+				ShamirShare^ sh = gcnew ShamirShare(i, yz, primeOfShare);
 				shares->Add(sh);
 			}
 
@@ -97,11 +99,11 @@ using namespace NTL;
 			}
 			//cout <<"g(x):"<< f;
 
-			ZZ* primePtr = new ZZ(p);
+			
 			List<IShare^>^ shares = gcnew List<IShare ^>();
 			for (int i = 1; i <= N; i++)
 			{
-				
+				ZZ* primePtr = new ZZ(p);
 				ZZ_p *yz = new ZZ_p(eval(f, ZZ_p(i)));
 
 				//cout<<'\n' <<"yz:"<<*yz<<'\n';
