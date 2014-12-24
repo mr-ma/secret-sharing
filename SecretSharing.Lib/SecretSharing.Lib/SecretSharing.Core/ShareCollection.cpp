@@ -12,6 +12,11 @@ using namespace System::Text;
 	int ShareCollection::GetCount(){
 		return shares->Count;
 	}
+
+	List<IShare^>^ ShareCollection::GetAllShares(){
+		return shares;
+	}
+
 	IShare^ ShareCollection::GetShare(int index){
 		return shares[index];
 	}

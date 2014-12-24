@@ -14,10 +14,10 @@ namespace SecretSharingCore
 		};
 		public interface class ISecretShare {
 		public:
-
-			List<IShare^>^ DivideSecret(int K, int N, long Secret);
-			long ReconstructSecret(List<IShare^>^ Shares);
-			long GetPrime();
+			/*List<IShareCollection^>^ DivideSecret(int K, int N, String^ Secret);
+			//List<IShare^>^ DivideSecret(int K, int N, long Secret);
+			long ReconstructSecret(List<IShareCollection^>^ Shares);
+			long GetPrime();*/
 		};
 	}
 }

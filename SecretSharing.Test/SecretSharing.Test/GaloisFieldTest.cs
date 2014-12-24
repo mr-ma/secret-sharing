@@ -14,7 +14,6 @@ namespace SecretSharing.Test
         [TestMethod]
         public void TestGaloisFieldMultiply()
         {
-            var p = 3299;
             var field =new  FiniteFieldArithmetic.FiniteField(64);
             var val1 = 23;
             var val2 = 12;

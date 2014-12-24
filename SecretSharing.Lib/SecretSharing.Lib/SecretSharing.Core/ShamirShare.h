@@ -54,11 +54,7 @@ namespace SecretSharingCore
 			}
 		
 			ShamirShare::!ShamirShare(){
-				/*_zz = NULL;
-				delete _zz;
-
-				_prime = NULL;
-				delete _prime;*/
+				///native pointer takes care of releasing pointers
 			}
 		internal:
 			ZZ_p* GetZZ(){

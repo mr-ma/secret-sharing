@@ -21,11 +21,10 @@ namespace SecretSharingCore
 			ZZ_p Shamir::InterpolateSecret(List<IShare^>^ Shares);
 		public:
 			Shamir::Shamir();
-			virtual List<IShare^>^ Shamir::DivideSecret(int K, int N, long Secret);
-			virtual long Shamir::ReconstructSecret(List<IShare^>^ Shares);
-			virtual long Shamir::GetPrime();
-			List<IShareCollection^>^ Shamir::DivideSecret(int K, int N, String^ Secret);
-			String^ Shamir::ReconstructSecret(List<IShareCollection^>^ shareCollections);
+			List<IShareCollection^>^ Shamir::DivideSecret(int K, int N, long Secret);
+			long Shamir::ReconstructSecret(List<IShareCollection^>^ Shares);
+			List<IShareCollection^>^ Shamir::DivideStringSecret(int K, int N, String^ Secret,Byte ChunkSize);
+			String^ Shamir::ReconstructStringSecret(List<IShareCollection^>^ shareCollections,Byte ChunkSize);
 			List<IShareCollection^>^ Shamir::DivideSecret(int K, int N, array<Byte>^ Secret, Byte ChunkSize);
 			array<Byte>^  Shamir::ReconstructSecret(List<IShareCollection^>^ shareCollections, Byte ChunkSize);
 		};

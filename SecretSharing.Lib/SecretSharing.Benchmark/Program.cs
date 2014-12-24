@@ -9,57 +9,39 @@ namespace SecretSharing.Benchmark
 {
     class Program
     {
-        static void Main(string[] args)
+
+
+
+        static void Benchmark256bitKeyWithPDFs()
         {
             Byte chunkSize = 8;
-            int MaxN = 100;
-            int MaxK = 100;
+            int MaxN = 50;
+            int MaxK = 50;
             int step = 5;
+            int iterate = 1;
 
 
-       
 
             ShamirAntixBenchmark benchmark = new ShamirAntixBenchmark();
-            var reports = benchmark.BenchmarkMeWithChunkSize(chunkSize, 50, 50, 5,SecretSharingBenchmarkReport.OperationType.SecretReconstruction,benchmark.key256bit, 10);
-            //var floatchunkreports = benchmark.BenchmarkMeWithChunkFloatSize(50, 50, 5, SecretSharingBenchmarkReport.OperationType.SecretReconstruction, benchmark.key256bit, 10);
-            
-            
-            var filteredrep = reports.Where(po => po.chunkSize == 8);
-
+            var reports = benchmark.BenchmarkMeWithChunkSize(chunkSize,MaxN, MaxK, step, SecretSharingBenchmarkReport.OperationType.ShareGeneration
+                |SecretSharingBenchmarkReport.OperationType.SecretReconstruction, benchmark.key256bit, iterate);
+          
+           // var filteredreconrep = reports.Where(po => po.Operation== SecretSharingBenchmarkReport.OperationType.SecretReconstruction);
+            var filteredgenrep = reports.Where(po => po.Operation == SecretSharingBenchmarkReport.OperationType.ShareGeneration);
             PDFGenerator pdfreport = new PDFGenerator();
-            pdfreport.GenBenchmarkDoc("256bit_n50_k50_recon_chunk64bit.pdf", filteredrep);
+            for (int i = 1; i < 512; i*=2)
+            {
+                var chunk = i;
+               // var queryreconrep = filteredreconrep.Where(po => po.chunkSize == chunk);
+                var querygenrep = filteredgenrep.Where(po => po.chunkSize == chunk);
 
-            filteredrep = reports.Where(po => po.chunkSize == 4);
-            pdfreport.GenBenchmarkDoc("256bit_n50_k50_recon_chunk32bit.pdf", filteredrep);
-
-            filteredrep = reports.Where(po => po.chunkSize == 1);
-            pdfreport.GenBenchmarkDoc("256bit_n50_k50_recon_chunk8bit.pdf", filteredrep);
-
-            //pdfreport.GenBenchmarkDoc("256bit_n50_k50_recon_floatchunk.pdf", floatchunkreports);
-            //benchmark.BenchmarkMeWithChunkSize(chunkSize, MaxN, MaxK, step, "AllResults100N_100K", 10);
-
-
-            /*var re = benchmark.BenchmarkMeWithChunkSize(chunkSize,MaxN,MaxK,step);
-            var k5 = re.Where(po => po.k == 5 && po.Operation == SecretSharingBenchmarkReport.OperationType.ShareGeneration);
-            var k10 = re.Where(po => po.k == 10 && po.Operation == SecretSharingBenchmarkReport.OperationType.ShareGeneration);
-            var k15 = re.Where(po => po.k == 15 && po.Operation == SecretSharingBenchmarkReport.OperationType.ShareGeneration);
-            var k20 = re.Where(po => po.k == 20 && po.Operation == SecretSharingBenchmarkReport.OperationType.ShareGeneration);
-            
-            var k5c = re.Where(po => po.k == 5 && po.Operation == SecretSharingBenchmarkReport.OperationType.SecretReconstruction);
-            var k10c = re.Where(po => po.k == 10 && po.Operation == SecretSharingBenchmarkReport.OperationType.SecretReconstruction);
-            var k15c = re.Where(po => po.k == 200 && po.Operation == SecretSharingBenchmarkReport.OperationType.SecretReconstruction);
-            var k20c = re.Where(po => po.k == 400 && po.Operation == SecretSharingBenchmarkReport.OperationType.SecretReconstruction);
-
-
-            var titles = new List<string>() { "k=5", "k=10", "k=15", "k=20", "kc=5", "kc=10", "kc=200", "kc=400" };
-
-            System.IO.File.WriteAllLines("k5_benchmarkresults.txt", k15c.Select(po=>po.ToString()));
-            System.IO.File.WriteAllLines("k5c_benchmarkresults.txt", k20c.Select(po => po.ToString()));
-            System.IO.File.WriteAllLines("AllResults.txt", re.Select(po => po.ToString()));
-            var reports = new List<IEnumerable<SecretSharingBenchmarkReport>>() { k5,k10,k15,k20,k5c,k10c,k15c,k20c};
-            Application.Run(new PerormanceAnalysisForm(reports,titles));*/
-
-
+               // pdfreport.GenBenchmarkDoc(string.Format("256bit_n50_k50_recon_chunk{0}bit.pdf", chunk), queryreconrep);
+                pdfreport.GenBenchmarkDoc(string.Format("256bit_n50_k50_gen_chunk{0}bit.pdf", chunk*8), querygenrep);
+            }
+        }
+        static void Main(string[] args)
+        {
+            Benchmark256bitKeyWithPDFs();
         }
     }
 }

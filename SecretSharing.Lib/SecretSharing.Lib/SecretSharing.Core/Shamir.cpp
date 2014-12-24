@@ -2,6 +2,7 @@
 #include "stdafx.h"
 #include "Shamir.h"
 #include "ShamirShare.h"
+#include <vector>
 using namespace System::Collections::Generic;
 using namespace System::Text;
 using namespace SecretSharingCore::Common;
@@ -14,54 +15,18 @@ using namespace NTL;
 
 
 
-		List<IShare^>^ Shamir::DivideSecret(int K, int N, long Secret){
-
-			//generate prime p
-			ZZ p = GenGermainPrime_ZZ(primeLength);
-			//cout << "prime number is:" << p << '\n';
-			while (p < Secret){
-				primeLength++;
-				p = GenGermainPrime_ZZ(primeLength);
-			}
-			
-
-			ZZ_p::init(p);
-			Vec<ZZ> coefficients = vec_ZZ();
-			ZZ maxRandom = ZZ(coefficientLength);
-			ZZ_pX f;
-			f.SetLength(K);
-			SetCoeff(f, 0, ZZ_p(Secret));
-			for (int i = 1; i < K; i++)
-			{
-				ZZ r = RandomBnd(maxRandom);
-				//cout << "random coeff number is:" << r << '\n';
-				SetCoeff(f, i, to_ZZ_p(r));
-			}
-
-			//cout << "F is:" << f << '\n';
-			List<IShare^>^ shares = gcnew List<IShare ^>();
-			
-			for (int i = 1; i <= N; i++)
-			{
-				ZZ *primeOfShare = new ZZ(p);
-				ZZ_p *yz = new ZZ_p(eval(f, ZZ_p(i)));
-				//ZZ_p yz = eval(f, ZZ_p(i));
-		/*		unsigned long y;
-				conv(y, yz);
-				if (y < 0 ) throw gcnew Exception(String::Format("Overflow in evaluating polynomial f with x={0}",i));*/
-				ShamirShare^ sh = gcnew ShamirShare(i, yz, primeOfShare);
-				shares->Add(sh);
-			}
-
-			return shares;
+		List<IShareCollection^>^ Shamir::DivideSecret(int K, int N, long Secret){
+			int size = sizeof(long);
+			array<Byte>^ arrayOfByte = BitConverter::GetBytes(Secret);
+			/*if (BitConverter::IsLittleEndian)
+				Array::Reverse(arrayOfByte);*/
+			return DivideSecret(K, N, arrayOfByte ,(Byte)size);
 		}
 
 		List<IShare^>^ Shamir::DivideSecret(int K, int N, array<Byte>^ Secret, int StartIndex,Byte ChunkSize)
 		{
 			pin_ptr<unsigned char> unmanagedSecretArray = &Secret[StartIndex];
-			//unsigned char* chunk;
 			ZZ chunkSecret = ZZFromBytes(unmanagedSecretArray, ChunkSize);
-			//delete unmanagedSecretArray;
 
 			//cout << "chunkSecret:"<<chunkSecret<<'\n';
 
@@ -73,8 +38,6 @@ using namespace NTL;
 			//cout << "prime number is:" << p << '\n';
 			while (p < chunkSecret){
 				RandomPrime(p, ChunkSize * 8);
-	/*			primeLength++;
-				p = GenGermainPrime_ZZ(primeLength);*/
 			//	cout << "prime:" << p << '\n';
 			}
 
@@ -107,10 +70,6 @@ using namespace NTL;
 				ZZ_p *yz = new ZZ_p(eval(f, ZZ_p(i)));
 
 				//cout<<'\n' <<"yz:"<<*yz<<'\n';
-				//ZZ_p yz = eval(f, ZZ_p(i));
-				/*		unsigned long y;
-				conv(y, yz);
-				if (y < 0 ) throw gcnew Exception(String::Format("Overflow in evaluating polynomial f with x={0}",i));*/
 				ShamirShare^ sh = gcnew ShamirShare(i, yz, primePtr);
 				shares->Add(sh);
 			}
@@ -120,10 +79,10 @@ using namespace NTL;
 
 		List<IShareCollection^>^ Shamir::DivideSecret(int K, int N, array<Byte>^ Secret, Byte ChunkSize)
 		{
-			//pin_ptr<unsigned char> unmanagedSecretArray = &Secret[0];
-			//unsigned char* chunk;
-			//ZZ chunkSecret = ZZFromBytes(unmanagedSecretArray, ChunkSize);
-
+			if (Secret->Length % ChunkSize != 0)
+			{
+				throw gcnew System::Exception("Secret array must be dividable to Chunk size");
+			}
 			List<IShareCollection^>^ shares = gcnew List<IShareCollection^>();
 			for (int i = 0; i*ChunkSize <Secret->Length; i++)
 			{
@@ -133,34 +92,27 @@ using namespace NTL;
 			return shares;
 		}
 
-		long Shamir::ReconstructSecret(List<IShare^>^ Shares){
-			ZZ_p secretz = InterpolateSecret(Shares);
-			unsigned long secret;
-			conv(secret, secretz);
-			return secret;
+		long Shamir::ReconstructSecret(List<IShareCollection^>^ Shares){
+			int size = sizeof(long);
+			array<Byte>^ resultArray = gcnew array<Byte>(size);
+			array<Byte>^ secret = ReconstructSecret(Shares, (Byte)size);
+			for (int i = 0; i < size;i++)
+			{
+				if (i < secret->Length)
+					resultArray[i] = secret[i];
+				else
+					resultArray[i] = 0;
+			}
+			return BitConverter::ToInt32(resultArray, 0);
 		}
 		
-		List<IShareCollection^>^ Shamir::DivideSecret(int K, int N, String^ Secret){
+		List<IShareCollection^>^ Shamir::DivideStringSecret(int K, int N, String^ Secret,Byte ChunkSize){
 			List<IShareCollection^>^ shares = gcnew List<IShareCollection^>();
-
 			array<Byte>^ bytes = Encoding::UTF8->GetBytes(Secret->ToCharArray());
-			for (int i = 0; i<bytes->Length; i++)
-			{
-				List<IShare^>^ currentLetterShares = DivideSecret(K,N, (int)bytes[i]);
-				ShareCollection::ScatterShareIntoCollection(currentLetterShares, shares, i);
-			}
-
-			return shares;
+			return DivideSecret(K, N, bytes, ChunkSize);
 		}
-		String^ Shamir::ReconstructSecret(List<IShareCollection^>^ shareCollections){
-			int count = shareCollections[0]->GetCount();
-			array<Byte>^ secret = gcnew array<Byte>(count);
-			for (int i = 0; i < count; i++)
-			{
-				List<IShare^>^ currentLetterList = ShareCollection::GatherShareFromCollection(shareCollections, i);
-				int currentSecretLetter = ReconstructSecret(currentLetterList);
-				secret[i] = currentSecretLetter;
-			}
+		String^ Shamir::ReconstructStringSecret(List<IShareCollection^>^ shareCollections,Byte ChunkSize){
+			array<Byte>^ secret = ReconstructSecret(shareCollections,ChunkSize);
 			return Encoding::UTF8->GetString(secret);
 
 		}
@@ -215,18 +167,6 @@ using namespace NTL;
 				array<Byte>^ currentSecretLetter = ReconstructSecret(currentLetterList, ChunkSize);
 				currentSecretLetter->CopyTo(secret, i*ChunkSize);
 			}
-			List<Byte>^ nonEmptyBytes = gcnew List<Byte>  ();
-			//remove empty bytes
-			for (int i = 0;i< secret->Length; i++)
-			{
-				if (secret[i] != '\0') nonEmptyBytes->Add(secret[i]);
-				else break;
-			}
-			return nonEmptyBytes->ToArray();
+			return secret;
 			
-		}
-
-		long Shamir::GetPrime(){
-			return this->prime;
-
 		}

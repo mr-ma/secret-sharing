@@ -16,6 +16,7 @@ namespace SecretSharing.Benchmark
 
        public void GenBenchmarkDoc(string filePath, IEnumerable<SecretSharingBenchmarkReport> reports=null)
        {
+           if (reports == null || reports.Count() == 0) return;
            Document doc = new Document(PageSize.A4);
            PdfWriter.GetInstance(doc, new FileStream(filePath, FileMode.Create));
            doc.Open();

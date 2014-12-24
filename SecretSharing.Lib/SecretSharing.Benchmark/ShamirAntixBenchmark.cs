@@ -1,5 +1,4 @@
-﻿using SecretSharing.Test;
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -7,6 +6,7 @@ using System.Threading.Tasks;
 using Antix.Testing;
 using System.Threading;
 using System.IO;
+using SecretSharingCore.Common;
 namespace SecretSharing.Benchmark
 {
     public class SecretSharingBenchmarkReport
@@ -37,7 +37,7 @@ namespace SecretSharing.Benchmark
             ,"1234567812345678123456781234567812345678123456781234567812345678"
         };
         byte[] Chunks = new Byte[]{
-            1,4,8
+            1,2,4,8,16,32
         };
         public String key64bit = "12345678";
         public String key128bit = "1234567812345678";
@@ -45,35 +45,11 @@ namespace SecretSharing.Benchmark
         public String key512bit = "1234567812345678123456781234567812345678123456781234567812345678";
 
         
-        public IEnumerable< String> BenchmarkMe()
-        {
-            var score = new SecretSharingCoreTests();
-            List<SecretSharingBenchmarkReport> results = new List<SecretSharingBenchmarkReport>();
-
-            for (int n = 10; n <= 50; n += 5)
-            {
-                //k can not be bigger than n
-                for (int k = 1; k <= n; k++)
-                {
-                    for (int i = 0; i < keys.Length; i++)
-                    {
-                        var re = Antix.Testing.Benchmark.Run(() => score.TestDivideSecret(n, k * 5, keys[i]), 2,5,10);
-                        results.Add(new SecretSharingBenchmarkReport() { n = n, k = k * 5, avg = re.Average, keyLength = keys[i].Length * 8 });
-                        GC.Collect();
-                    }
-                }
-            }
-            var orderedResults = results.OrderBy(po => po.keyLength).ThenBy(po => po.n).ThenBy(po => po.k); 
-
-
-            return orderedResults.Select(po => String.Format("keylength:{0}  n:{1} k:{2}  avg:{3}", po.keyLength, po.n, po.k, po.avg));
-        }
-
+       
 
         public IEnumerable<SecretSharingBenchmarkReport> BenchmarkMeWithChunkSize(
             byte chunkSize, int MaxN, int MaxK, int step,SecretSharingBenchmarkReport.OperationType operation,string key = "12345678",int iterate=1)
         {
-            var score = new SecretSharingCoreTests();
             List<SecretSharingBenchmarkReport> results = new List<SecretSharingBenchmarkReport>();
 
             for (int n = 5; n <= MaxN; n += step)
@@ -89,17 +65,17 @@ namespace SecretSharing.Benchmark
                             if (operation.HasFlag(SecretSharingBenchmarkReport.OperationType.ShareGeneration))
                             {
                                 var redivide = Antix.Testing.Benchmark.Run(() =>
-                                   score.TestDivideSecretWithChunkSize(n, k, Chunks[iteratechunk], key/*keys[i]*/)
+                                   DivideSecretWithChunkSizeWrapper(n, k, Chunks[iteratechunk], key/*keys[i]*/)
                                    , iterate);
                                
                                 results.Add(new SecretSharingBenchmarkReport() { n = n, chunkSize = Chunks[iteratechunk], k = k, avg = redivide.Average, keyLength = key/*s[i]*/.Length * 8, Operation = SecretSharingBenchmarkReport.OperationType.ShareGeneration });
                             }
                             if (operation.HasFlag(SecretSharingBenchmarkReport.OperationType.SecretReconstruction))
                             {
-                                var shares = score.TestDivideSecretWithChunkSize(n, k, Chunks[iteratechunk], key /*keys[i]*/);
+                                var shares = DivideSecretWithChunkSizeWrapper(n, k, Chunks[iteratechunk], key /*keys[i]*/);
 
                                 var reconstruct = Antix.Testing.Benchmark.Run(() =>
-                              score.TestReconstructSecretWithChunkSize(shares, Chunks[iteratechunk])
+                              ReconstructSecretWithChunkSizeWrapper(shares,k, Chunks[iteratechunk])
                               , iterate);
                                 results.Add(new SecretSharingBenchmarkReport() { n = n, chunkSize = Chunks[iteratechunk], k = k, avg = reconstruct.Average, keyLength = key/*s[i]*/.Length * 8, Operation = SecretSharingBenchmarkReport.OperationType.SecretReconstruction });
                             }
@@ -122,7 +98,6 @@ namespace SecretSharing.Benchmark
         public IEnumerable<SecretSharingBenchmarkReport> BenchmarkMeWithChunkFloatSize(
           int MaxN, int MaxK, int step, SecretSharingBenchmarkReport.OperationType operation, string key = "12345678", int iterate = 1)
         {
-            var score = new SecretSharingCoreTests();
             List<SecretSharingBenchmarkReport> results = new List<SecretSharingBenchmarkReport>();
 
             for (int n = 5; n <= MaxN; n += step)
@@ -138,17 +113,17 @@ namespace SecretSharing.Benchmark
                             if (operation.HasFlag(SecretSharingBenchmarkReport.OperationType.ShareGeneration))
                             {
                                 var redivide = Antix.Testing.Benchmark.Run(() =>
-                                   score.TestDivideSecretWithChunkSize(n, k, (byte)key.Length, key/*keys[i]*/)
+                                   DivideSecretWithChunkSizeWrapper(n, k, (byte)key.Length, key/*keys[i]*/)
                                    , iterate);
 
                                 results.Add(new SecretSharingBenchmarkReport() { n = n, chunkSize = (byte)key.Length, k = k, avg = redivide.Average, keyLength = key/*s[i]*/.Length * 8, Operation = SecretSharingBenchmarkReport.OperationType.ShareGeneration });
                             }
                             if (operation.HasFlag(SecretSharingBenchmarkReport.OperationType.SecretReconstruction))
                             {
-                                var shares = score.TestDivideSecretWithChunkSize(n, k, (byte)key.Length, key /*keys[i]*/);
+                                var shares = DivideSecretWithChunkSizeWrapper(n, k, (byte)key.Length, key /*keys[i]*/);
 
                                 var reconstruct = Antix.Testing.Benchmark.Run(() =>
-                              score.TestReconstructSecretWithChunkSize(shares, (byte)key.Length)
+                              ReconstructSecretWithChunkSizeWrapper(shares,k, (byte)key.Length)
                               , iterate);
                                 results.Add(new SecretSharingBenchmarkReport() { n = n, chunkSize = (byte)key.Length, k = k, avg = reconstruct.Average, keyLength = key/*s[i]*/.Length * 8, Operation = SecretSharingBenchmarkReport.OperationType.SecretReconstruction });
                             }
@@ -173,7 +148,6 @@ namespace SecretSharing.Benchmark
         {
             File.Delete(PathToReportFile);
 
-            var score = new SecretSharingCoreTests();
             List<SecretSharingBenchmarkReport> results = new List<SecretSharingBenchmarkReport>();
 
             for (int n = 10; n <= MaxN; n += step)
@@ -187,11 +161,11 @@ namespace SecretSharing.Benchmark
                         for (int i = 0; i < keys.Length; i++)
                         {
                             var redivide = Antix.Testing.Benchmark.Run(() =>
-                               score.TestDivideSecretWithChunkSize(n, k, Chunks[iteratechunk], keys[i])
+                               DivideSecretWithChunkSizeWrapper(n, k, Chunks[iteratechunk], keys[i])
                                , iterate);
-                            var shares = score.TestDivideSecretWithChunkSize(n, k, Chunks[iteratechunk], keys[i]);
+                            var shares = DivideSecretWithChunkSizeWrapper(n, k, Chunks[iteratechunk], keys[i]);
                             var reconstruct = Antix.Testing.Benchmark.Run(() =>
-                          score.TestReconstructSecretWithChunkSize(shares, Chunks[iteratechunk])
+                          ReconstructSecretWithChunkSizeWrapper(shares,k, Chunks[iteratechunk])
                           , iterate);
                            // results.Add(
                             var gen = new SecretSharingBenchmarkReport() { n = n, chunkSize = Chunks[iteratechunk], k = k, avg = redivide.Average, keyLength = keys[i].Length * 8, Operation = SecretSharingBenchmarkReport.OperationType.ShareGeneration };
@@ -220,12 +194,11 @@ namespace SecretSharing.Benchmark
             var k = 3;
             var iterate = 5;
 
-            var score = new SecretSharingCoreTests();
             List<SecretSharingBenchmarkReport> results = new List<SecretSharingBenchmarkReport>();
 
             for (int i = 0; i < 1000000; i++)
             {
-                var re = Antix.Testing.Benchmark.Run(() => score.TestDivideSecretWithChunkSize(n, k * 5, 8, keys[0]), iterate);
+                var re = Antix.Testing.Benchmark.Run(() => DivideSecretWithChunkSizeWrapper(n, k * 5, 8, keys[0]), iterate);
                 GC.Collect();
             }
                 // results.Add(new SecretSharingBenchmarkReport() { n = n, k = k * 5, avg = re.Average, keyLength = keys[0].Length * 8 });
@@ -233,6 +206,23 @@ namespace SecretSharing.Benchmark
 
 
             // orderedResults.Select(po => String.Format("keylength:{0}  n:{1} k:{2}  avg:{3}", po.keyLength, po.n, po.k, po.avg));
+        }
+
+
+
+        public List<IShareCollection> DivideSecretWithChunkSizeWrapper(int n, int k, byte ChunkSize, String Secret)
+        {
+            SecretSharingCore.Algorithms.Shamir shamir = new SecretSharingCore.Algorithms.Shamir();
+            var byteSecret = Encoding.UTF8.GetBytes(Secret.ToCharArray());
+            return shamir.DivideSecret(k, n, byteSecret, ChunkSize);
+        }
+
+        public void ReconstructSecretWithChunkSizeWrapper(List<IShareCollection> shares,int k, byte chunkSize)
+        {
+            SecretSharingCore.Algorithms.Shamir shamir = new SecretSharingCore.Algorithms.Shamir();
+            //assign
+            var reconSecret = Encoding.UTF8.GetString(shamir.ReconstructSecret(shares.GetRange(0,k), chunkSize));
+
         }
     }
 }

@@ -4,6 +4,7 @@ using SecretSharingCore.Common;
 using SecretSharing.Lib.Common;
 using System.Text;
 using System.Collections.Generic;
+using System.Linq;
 namespace SecretSharing.Test
 {
     [TestClass]
@@ -30,7 +31,7 @@ namespace SecretSharing.Test
             var k = 3;
             var secret = "1234567890";
             var byteSecret = Encoding.UTF8.GetBytes(secret.ToCharArray());
-            byte chunkSize = 8;
+            byte chunkSize = 5;
             //assign
             var shares = shamir.DivideSecret(k, n, byteSecret,chunkSize);
             //assert
@@ -44,94 +45,38 @@ namespace SecretSharing.Test
             var k = 3;
             var secret = "1234567890";
             var byteSecret = Encoding.UTF8.GetBytes(secret.ToCharArray());
-            byte chunkSize = 8;
+            byte chunkSize = 5;
             //assign
             var shares = shamir.DivideSecret(k, n, byteSecret, chunkSize);
-            var reconSecret = Encoding.UTF8.GetString( shamir.ReconstructSecret(shares, chunkSize));
+            //if the secret array is not dividable to the chunk we have to truncate null values
+            var reconSecret = Encoding.UTF8.GetString( shamir.ReconstructSecret(shares, chunkSize).Where(ch=>ch !='\0').ToArray());
             //assert
             Assert.AreEqual(shares.Count, n);
             Assert.AreEqual(secret, reconSecret);
         }
 
-        public List<IShareCollection> TestDivideSecretWithChunkSize(int n, int k, byte ChunkSize,String Secret)
-        {
-            SecretSharingCore.Algorithms.Shamir shamir = new SecretSharingCore.Algorithms.Shamir();
-            var byteSecret = Encoding.UTF8.GetBytes(Secret.ToCharArray());
-            //assign
-            return shamir.DivideSecret(k, n, byteSecret, ChunkSize);
-            //assert
-            
-        }
 
 
 
-        public void TestDivideSecret(int n,int k,string Secret)
-        {
-            SecretSharingCore.Algorithms.Shamir shamir = new SecretSharingCore.Algorithms.Shamir();
-            //assign
-            var shares = shamir.DivideSecret(k, n, Secret);
-          
-        }
-        public void TestDivideSecret(int n)
-        {
-            var k = 5;
-            var Secret = "Test";
-            SecretSharingCore.Algorithms.Shamir shamir = new SecretSharingCore.Algorithms.Shamir();
-            //assign
-            var shares = shamir.DivideSecret(k, n, Secret);
-
-        }
         [TestMethod]
-        public void ReconstructSecretTest()
+        public void TestReconstruct_Numeric_LongType_Secret()
         {
             //arrange
             var shamir = new SecretSharingCore.Algorithms.Shamir(); ;
             var n = 10;
             var k = 3;
-            var secret = 2146985113;
+            var secret = 32456;
             //assign
             var shares = shamir.DivideSecret(k, n, secret);
-            //  Assert.IsFalse(shamir.GetPrime() < 0);
 
-            var kPortionOfShares = shares.GetRange(0, k);
-
-            var reconSecret = shamir.ReconstructSecret(kPortionOfShares);
-            if (secret != reconSecret)
-            {
-                Console.WriteLine(shamir.GetPrime());
-            }
-
+            var reconSecret = shamir.ReconstructSecret(shares);
             //assert
-            Assert.AreEqual(k, kPortionOfShares.Count);
-            Assert.AreEqual(shares.Count, n);
+            //Assert.AreEqual(k, kPortionOfShares.Count);
+            //Assert.AreEqual(shares.GetCount(), n);
             Assert.AreEqual(secret, reconSecret);
         }
+      
 
-        [TestMethod]
-        public void ReconstructSecretTestRandomAttempt()
-        {
-            //arrange
-            var shamir = new SecretSharingCore.Algorithms.Shamir(); ;
-            var n = 10;
-            var k = 3;
-            var counter = 1000;
-            Random r = new Random();
-            while (counter>0)
-            {
-                counter--;
-                var secret = r.Next();
-                //assign
-                var shares = shamir.DivideSecret(k, n, secret);
-                var kPortionOfShares = shares.GetRange(0, k);
-
-                var reconSecret = shamir.ReconstructSecret(kPortionOfShares);
-                //assert
-                Assert.AreEqual(k, kPortionOfShares.Count);
-                Assert.AreEqual(shares.Count, n);
-                Assert.AreEqual(secret, reconSecret);
-
-            }
-        }
         [TestMethod]
         public void FailReconstructSecretTest()
         {
@@ -146,12 +91,11 @@ namespace SecretSharing.Test
             var kPortionOfShares = shares.GetRange(0, k-1);
 
             var reconSecret = shamir.ReconstructSecret(kPortionOfShares);
-            //assert
+            ////assert
             Assert.AreNotEqual(k, kPortionOfShares.Count);
             Assert.AreEqual(shares.Count, n);
             Assert.AreNotEqual(secret, reconSecret);
         }
-
 
         [TestMethod]
         public void TestStringDivideSecret()
@@ -159,83 +103,26 @@ namespace SecretSharing.Test
             SecretSharingCore.Algorithms.Shamir shamir = new SecretSharingCore.Algorithms.Shamir();
             var n = 10;
             var k = 3;
-            var secret = "1234";
+            var secret = "1234567812345678123456781234567812345678123456781234567812345678";
             //assign
-            var shares = shamir.DivideSecret(k, n, secret);
+            var shares = shamir.DivideStringSecret(k, n, secret,(byte) 32);
             //assert
             Assert.AreEqual(shares.Count, n);
         }
         [TestMethod]
-        public void ReconstructStringSecretTest()
-        {
-            //arrange
-            var shamir = new SecretSharingCore.Algorithms.Shamir(); ;
-            var n = 10;
-            var k = 3;
-            var secret = "2345";
-            //assign
-            var shares = shamir.DivideSecret(k, n, secret);
-
-            var kPortionOfShares = shares.GetRange(0, k);
-
-            var reconSecret = shamir.ReconstructSecret(kPortionOfShares);
-            //assert
-            Assert.AreEqual(k, kPortionOfShares.Count);
-            Assert.AreEqual(shares.Count, n);
-            Assert.AreEqual(secret, reconSecret);
-        }
-        [TestMethod]
-        public void FailReconstructStringSecretTest()
-        {
-            //arrange
-            var shamir = new SecretSharingCore.Algorithms.Shamir(); 
-            var n = 10;
-            var k = 3;
-            var secret = "2345";
-            //assign
-            var shares = shamir.DivideSecret(k, n, secret);
-
-            var kPortionOfShares = shares.GetRange(0, k - 1);
-
-            var reconSecret = shamir.ReconstructSecret(kPortionOfShares);
-            //assert
-            Assert.AreNotEqual(k, kPortionOfShares.Count);
-            Assert.AreEqual(shares.Count, n);
-            Assert.AreNotEqual(secret, reconSecret);
-        }
-
-        [TestMethod]
-        public void Reconstruct256bitSecretTest()
-        {
-            //arrange
-            var randomAlgorithm = new SimpleRandom();
-            var shamir = new SecretSharingCore.Algorithms.Shamir(); 
-            var n = 10;
-            var k = 3;
-            var secrets = randomAlgorithm.GetRandomArray(32, 0, 255);
-            for (int i = 0; i < 32; i++)
-            {
-                //assign
-                var shares = shamir.DivideSecret(k,n,secrets[i]);
-
-                var kPortionOfShares = shares.GetRange(0, k);
-
-                var reconSecret = shamir.ReconstructSecret(kPortionOfShares);
-                //assert
-                Assert.AreEqual(k, kPortionOfShares.Count);
-                Assert.AreEqual(shares.Count, n);
-                Assert.AreEqual(secrets[i], reconSecret);
-            }
-
-        }
-
-
-        public void TestReconstructSecretWithChunkSize(List<IShareCollection> shares, byte chunkSize)
+        public void TestStringReconstructSecret()
         {
             SecretSharingCore.Algorithms.Shamir shamir = new SecretSharingCore.Algorithms.Shamir();
+            var n = 5;
+            var k = 1;
+            var secret = "12345678123456781234567812345678";//12345678123456781234567812345678";
             //assign
-            var reconSecret = Encoding.UTF8.GetString(shamir.ReconstructSecret(shares, chunkSize));
-           
+            var shares = shamir.DivideStringSecret(k, n, secret,(byte)16);
+            var kShares = shares.GetRange(0, k);
+            var reconsecret = shamir.ReconstructStringSecret(kShares,(byte)16);
+            //assert
+            Assert.AreEqual(shares.Count, n);
+            Assert.AreEqual(secret, reconsecret);
         }
     }
 }
