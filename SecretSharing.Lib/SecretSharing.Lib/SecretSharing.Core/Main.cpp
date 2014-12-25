@@ -1,7 +1,7 @@
 // HelloWorld.cpp : main project file.
-#define _CRTDBG_MAP_ALLOC
-#include <stdlib.h>
-#include <crtdbg.h>
+//#define _CRTDBG_MAP_ALLOC
+//#include <stdlib.h>
+//#include <crtdbg.h>
 #include "stdafx.h"
 #include <NTL/ZZ_pXFactoring.h>
 #include "stdafx.h"
@@ -69,7 +69,7 @@ void runByteChunkShare(){
 
 int main(array<System::String ^> ^args)
 {
-	_CrtSetReportMode(_CRT_ERROR, _CRTDBG_MODE_DEBUG);
+	//_CrtSetReportMode(_CRT_ERROR, _CRTDBG_MODE_DEBUG);
 
 	/*Vec<ZZ_p> y = vec_ZZ_p();
 	Vec<ZZ_p> x = vec_ZZ_p();
@@ -186,6 +186,6 @@ int main(array<System::String ^> ^args)
 	CanZass(factors, f);  // calls "Cantor/Zassenhaus" algorithm
 
 	cout << factors << "\n";
-	*/	_CrtDumpMemoryLeaks(); 
+	*/	//_CrtDumpMemoryLeaks(); 
 	Console::Read();
 }

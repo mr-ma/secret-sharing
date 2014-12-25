@@ -112,17 +112,17 @@ namespace SecretSharing.Test
         [TestMethod]
         public void TestStringReconstructSecret()
         {
-            SecretSharingCore.Algorithms.Shamir shamir = new SecretSharingCore.Algorithms.Shamir();
-            var n = 5;
-            var k = 1;
-            var secret = "12345678123456781234567812345678";//12345678123456781234567812345678";
-            //assign
-            var shares = shamir.DivideStringSecret(k, n, secret,(byte)16);
-            var kShares = shares.GetRange(0, k);
-            var reconsecret = shamir.ReconstructStringSecret(kShares,(byte)16);
-            //assert
-            Assert.AreEqual(shares.Count, n);
-            Assert.AreEqual(secret, reconsecret);
+                SecretSharingCore.Algorithms.Shamir shamir = new SecretSharingCore.Algorithms.Shamir();
+                var n = 5;
+                var k = 1;
+                var secret = "12345678123456781234567812345678";//12345678123456781234567812345678";
+                //assign
+                var shares = shamir.DivideStringSecret(k, n, secret, (byte)16);
+                var kShares = shares.GetRange(0, k);
+                var reconsecret = shamir.ReconstructStringSecret(kShares, (byte)16);
+                //assert
+                Assert.AreEqual(shares.Count, n);
+                Assert.AreEqual(secret, reconsecret);
         }
     }
 }

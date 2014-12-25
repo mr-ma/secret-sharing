@@ -12,7 +12,7 @@ namespace SecretSharingCore
 		private:
 			int _x;
 			unsigned long _y;
-			CAutoNativePtr< ZZ_p> _zz;
+			CAutoNativePtr<ZZ_p> _zz;
 			CAutoNativePtr<ZZ> _prime;
 		public:
 			ShamirShare(const ShamirShare% rhs){

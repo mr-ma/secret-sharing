@@ -80,8 +80,6 @@ namespace SecretSharing.Benchmark
                                 results.Add(new SecretSharingBenchmarkReport() { n = n, chunkSize = Chunks[iteratechunk], k = k, avg = reconstruct.Average, keyLength = key/*s[i]*/.Length * 8, Operation = SecretSharingBenchmarkReport.OperationType.SecretReconstruction });
                             }
                             Console.WriteLine("Iteration info: n:{0} k:{1} keySize:{2} chunkSize(bits):{3}", n,k, key/*s[i]*/.Length * 8, Chunks[iteratechunk]*8);
-
-                            GC.Collect();
                         }
                     }
                     if (k == 1) k = step;
@@ -174,7 +172,6 @@ namespace SecretSharing.Benchmark
                             Console.WriteLine("Iteration info: n:{0} k:{1} keySize:{2} chunkSize(bits):{3}", n, k, keys[i].Length * 8, Chunks[iteratechunk] * 8);
                             File.AppendAllText(PathToReportFile, gen.ToString()+Environment.NewLine);
                             File.AppendAllText(PathToReportFile, con.ToString() + Environment.NewLine);
-                            GC.Collect();
                         }
                     }
                     if (k == 1) k = step;

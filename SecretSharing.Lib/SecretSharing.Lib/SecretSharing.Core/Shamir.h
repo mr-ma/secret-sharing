@@ -1,7 +1,7 @@
 #pragma once
 #include <NTL/ZZ_pXFactoring.h>
 #include "IShareCollection.h"
-
+#include <msclr\lock.h>
 using namespace System;
 using namespace System::Collections::Generic;
 using namespace NTL;
@@ -13,6 +13,7 @@ namespace SecretSharingCore
 	namespace Algorithms{
 		public ref class Shamir :ISecretShare{
 		private:
+			static Object^ m_lock = gcnew Object();
 			unsigned long prime;
 			long primeLength = 17;
 			const long coefficientLength = 5913;

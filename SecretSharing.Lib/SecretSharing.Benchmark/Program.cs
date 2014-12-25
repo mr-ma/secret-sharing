@@ -15,12 +15,10 @@ namespace SecretSharing.Benchmark
         static void Benchmark256bitKeyWithPDFs()
         {
             Byte chunkSize = 8;
-            int MaxN = 50;
-            int MaxK = 50;
+            int MaxN = 10;
+            int MaxK = 5;
             int step = 5;
             int iterate = 1;
-
-
 
             ShamirAntixBenchmark benchmark = new ShamirAntixBenchmark();
             var reports = benchmark.BenchmarkMeWithChunkSize(chunkSize,MaxN, MaxK, step, SecretSharingBenchmarkReport.OperationType.ShareGeneration

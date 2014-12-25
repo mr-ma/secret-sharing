@@ -22,7 +22,7 @@ namespace SecretSharing.ProfilerRunner
             //{
             //    Console.WriteLine(item);
             //}
-            benchmark.BenchmarkMeWithChunkSizeFixedParameters();
+           // benchmark.BenchmarkMeWithChunkSizeFixedParameters();
             Console.ReadLine();
             //System.IO.File.WriteAllLines("benchmarkresultsNew.txt", re);
         }

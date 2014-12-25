@@ -3,11 +3,13 @@
 #include "Shamir.h"
 #include "ShamirShare.h"
 #include <vector>
+#include <msclr\lock.h>
 using namespace System::Collections::Generic;
 using namespace System::Text;
 using namespace SecretSharingCore::Common;
 using namespace SecretSharingCore::Algorithms;
 using namespace NTL;
+using namespace System::Threading;
 		Shamir::Shamir(){
 
 		}
@@ -145,17 +147,31 @@ using namespace NTL;
 
 			return secretz;
 		}
-
+		
+		unsigned char* ZZToByteArray(ZZ value, int chunkSize){
+			
+			unsigned char *b;
+			b = (unsigned char*)malloc(sizeof(unsigned char) * chunkSize);
+			int i;
+			for (i = 0; i < chunkSize ; i++){
+				int offset = (chunkSize - 1 - i) * chunkSize;
+				int tempa;
+				conv(tempa, ((value >> offset) & 0xFFFFFFFL));
+				b[i] = tempa;
+			}
+			return b;
+		}
 		array<Byte>^ Shamir::ReconstructSecret(List<IShare^>^ Shares, Byte ChunkSize){
 
-			ZZ_p secretz = InterpolateSecret(Shares);
-
-			unsigned char* unmanagedSecretArray = new unsigned char();
-			BytesFromZZ(unmanagedSecretArray, to_ZZ( secretz._ZZ_p__rep), ChunkSize);
+			ZZ_p secretz =InterpolateSecret(Shares);
+			ZZ secret;
+			unsigned char* unmanagedSecretArray = (unsigned char*)malloc(sizeof(unsigned char) * ChunkSize);
+			conv(secret, secretz);
+			BytesFromZZ(unmanagedSecretArray, secret, (long)ChunkSize);
 			array<Byte>^ _Data = gcnew array<Byte>(ChunkSize);
 			System::Runtime::InteropServices::Marshal::Copy(IntPtr((void *)unmanagedSecretArray), _Data, 0, ChunkSize);
 			
-			//delete unmanagedSecretArray;
+			delete unmanagedSecretArray;
 			return _Data;
 		}
 		array<Byte>^  Shamir::ReconstructSecret(List<IShareCollection^>^ shareCollections,Byte ChunkSize){
