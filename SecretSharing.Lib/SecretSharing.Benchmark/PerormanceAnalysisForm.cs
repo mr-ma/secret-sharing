@@ -5,6 +5,7 @@ using System.Collections.Generic;
 using System.ComponentModel;
 using System.Data;
 using System.Drawing;
+using System.IO;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
@@ -60,29 +61,52 @@ namespace SecretSharing.Benchmark
 
 
 
-        public PerormanceAnalysisForm(List<IEnumerable<SecretSharingBenchmarkReport>> results, List<string> titles)
+        public PerormanceAnalysisForm(List<IEnumerable<SecretSharingBenchmarkReport>> results, List<string> titles, string PlotTitle,string ExportPdfFileName = null)
         {
 
             InitializeComponent();
             InitPlotView();
 
-            var myModel = new PlotModel { Title = "Performance Report" };
+            var myModel = new PlotModel { Title = string.Format("Performance Report {0}", PlotTitle) };
             int i = 0;
+            int maxMs = 0;
+            if (results.Count == 0) return;
+            int minMs = results[0].FirstOrDefault().avg.Milliseconds;
+            int minN = results[0].FirstOrDefault().n;
+            int maxN = 0;
             foreach (var reports in results)
             {
                 var lineSeries = new LineSeries(titles[i]);
-
+                lineSeries.MarkerType = MarkerType.Circle;
+                lineSeries.Smooth = true;
+                
                 foreach (var report in reports)
                 {
-                    lineSeries.Points.Add(new DataPoint(report.n, report.avg.TotalSeconds*100));
+                    if (report.avg.Milliseconds < minMs) minMs = report.avg.Milliseconds;
+                    if (report.n < minN) minN = report.n;
+                    if (report.n > maxN) maxN = report.n;
+                    if (report.avg.Milliseconds > maxMs) { maxMs = report.avg.Milliseconds; }
+                    lineSeries.Points.Add(new DataPoint(report.n, report.avg.Milliseconds));
                 }
-                myModel.Series.Add(lineSeries);
+                if (lineSeries.Points.Count > 0)
+                {
+                    myModel.Series.Add(lineSeries);
+                }
                 i++;
             }
-
-           
-            myModel.Series.Add(new FunctionSeries(nloglogn, 0, 10, 0.1, "N log2(N)"));
+           // myModel.Series.Add(new FunctionSeries(nloglogn, 0, 10, 0.1, "N log2(N)"));
+            myModel.Axes.Add(new OxyPlot.Axes.LinearAxis(OxyPlot.Axes.AxisPosition.Bottom, minN,maxN, "N"));
+            myModel.Axes.Add(new OxyPlot.Axes.LinearAxis(OxyPlot.Axes.AxisPosition.Left, minMs -3 <0? 0:minMs -3 ,maxMs, "ms"));
             this.plot1.Model = myModel;
+
+            if (ExportPdfFileName != null)
+            {
+                using (var stream = File.Create(ExportPdfFileName))
+                {
+                    PdfExporter.Export(myModel, stream, 600, 400);
+                    OxyPlot.WindowsForms.PngExporter.Export(myModel, ExportPdfFileName+".png", 600, 400, Brushes.White);
+                }
+            }
         }
 
         double nloglogn(double n)
