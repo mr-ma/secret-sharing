@@ -1,7 +1,6 @@
 ﻿using System;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 using SecretSharingCore.Common;
-using SecretSharing.Lib.Common;
 using System.Text;
 using System.Collections.Generic;
 using System.Linq;
@@ -22,7 +21,42 @@ namespace SecretSharing.Test
             //assert
             Assert.AreEqual(shares.Count, n);
         }
+        [TestMethod]
+        public void TestInitiateSecretWith_Y_P_Array()
+        {
+            SecretSharingCore.Algorithms.Shamir shamir = new SecretSharingCore.Algorithms.Shamir();
+            var n = 10;
+            var k = 3;
+            var secret = 1234;
+            //assign
+            var shares = shamir.DivideSecret(k, n,secret);
+            var initiatedShares = new List<IShareCollection>();
+            //assert
+            Assert.AreEqual(shares.Count, n);
+            int j = 0;
+            foreach (var col in shares)
+            {
+                j++;
+                IShareCollection collection = new ShareCollection();
+                for (int i = 0; i < col.GetCount(); i++)
+                {
+                   
+                    Assert.IsNotNull(col.GetShare(i).GetY());
+                    Assert.IsNotNull(col.GetShare(i).GetP());
 
+                    ShamirShare myshare = new ShamirShare(col.GetShare(i).GetX(), col.GetShare(i).GetY()
+                        , col.GetShare(i).GetP());
+
+                    Assert.AreEqual(col.GetShare(i).ToString(), myshare.ToString());
+                    collection.SetShare(i, myshare);
+                }
+                initiatedShares.Add(collection);
+                if (j == k) break;
+            }
+
+            var reconsecret = shamir.ReconstructSecret(initiatedShares);
+            Assert.AreEqual(secret,reconsecret);
+        }
         [TestMethod]
         public void TestDivideSecretWithChunkSize()
         {

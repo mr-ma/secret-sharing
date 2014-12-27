@@ -66,12 +66,12 @@ using namespace System::Text;
 	{
 		StringBuilder^ builder = gcnew StringBuilder();
 		if (this->shares && this->shares->Count > 0){
-			builder->AppendFormat("##Begin ShareCollection length={0}{1}", this->shares->Count, Environment::NewLine);
+			//builder->AppendFormat("##Begin ShareCollection length={0}{1}", this->shares->Count, Environment::NewLine);
 			for (int i = 0; i < this->shares->Count; i++)
 			{
 				builder->AppendFormat("index ={0} ,share= {1} {2}", i, shares[i]->ToString(), Environment::NewLine);
 			}
-			builder->AppendFormat("##End ShareCollection {0}", Environment::NewLine);
+			//builder->AppendFormat("##End ShareCollection {0}", Environment::NewLine);
 		}
 		return builder->ToString();
 	}

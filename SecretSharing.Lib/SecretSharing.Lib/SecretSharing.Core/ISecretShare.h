@@ -9,7 +9,8 @@ namespace SecretSharingCore
 		public interface class IShare : IDisposable {
 		public:
 			int GetX();
-			unsigned long GetY();
+			array<Byte>^ GetY();
+			array<Byte>^ GetP();
 			String^ ToString();
 		};
 		public interface class ISecretShare {
