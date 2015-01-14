@@ -38,11 +38,12 @@ namespace SecretSharing.Benchmark
     }
     public class ShamirAntixBenchmark
     {
-        //string[] keys = new string[]{"12345678"
-        //    ,"1234567812345678"
-        //    ,"12345678123456781234567812345678"
-        //    ,"1234567812345678123456781234567812345678123456781234567812345678"
-        //};
+        string[] keys = new string[]{"12345678"
+            ,"1234567812345678"
+            ,"12345678123456781234567812345678"
+            ,"1234567812345678123456781234567812345678123456781234567812345678"
+            ,"12345678123456781234567812345678123456781234567812345678123456781234567812345678123456781234567812345678123456781234567812345678"
+        };
 
         public String key64bit = "12345678";
         public String key128bit = "1234567812345678";
@@ -52,8 +53,21 @@ namespace SecretSharing.Benchmark
         public String key1024bit = "12345678123456781234567812345678123456781234567812345678123456781234567812345678123456781234567812345678123456781234567812345678";
 
 
-        public IEnumerable<SecretSharingBenchmarkReport> BenchmarkMeWithChunkSize(
-            byte[] chunkSize, int MaxN, int MaxK, int step, SecretSharingBenchmarkReport.OperationType operation, string key = "12345678", int iterate = 1)
+        public IEnumerable<SecretSharingBenchmarkReport> BenchmarkAllKeysWithChunkSize(byte[] chunkSize, 
+            int MaxN, int MaxK, int step, 
+            SecretSharingBenchmarkReport.OperationType operation,
+             int iterate = 1)
+        {
+            var reports = new List<SecretSharingBenchmarkReport>();
+            for (int i = 0; i < keys.Length; i++)
+            {
+                reports.AddRange(BenchmarkKeyWithChunkSize(chunkSize,MaxN,MaxK,step,operation,keys[i],iterate));
+            }
+            return reports;
+        }
+        public IEnumerable<SecretSharingBenchmarkReport> BenchmarkKeyWithChunkSize(
+            byte[] chunkSize, int MaxN, int MaxK, int step, 
+            SecretSharingBenchmarkReport.OperationType operation, string key = "12345678", int iterate = 1)
         {
             List<SecretSharingBenchmarkReport> results = new List<SecretSharingBenchmarkReport>();
 
@@ -65,6 +79,9 @@ namespace SecretSharing.Benchmark
 
                     for (int iteratechunk = 0; iteratechunk < chunkSize.Length; iteratechunk++)
                     {
+                        ///skip if the chunk is bigger than the secret
+                        if (chunkSize[iteratechunk] > key.Length * 8) break;
+
                         List<IShareCollection> shares = null;
                         //if (operation.HasFlag(SecretSharingBenchmarkReport.OperationType.ShareGeneration))
                         //{
