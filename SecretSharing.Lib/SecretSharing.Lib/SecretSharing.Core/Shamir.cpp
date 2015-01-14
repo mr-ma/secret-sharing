@@ -25,6 +25,10 @@ using namespace System::Threading;
 			return DivideSecret(K, N, arrayOfByte ,(Byte)size);
 		}
 
+		unsigned long Shamir::GetPrimeGenerationTime(){
+			return this->primeGenTime;
+		}
+
 		List<IShare^>^ Shamir::DivideSecret(int K, int N, array<Byte>^ Secret, int StartIndex,Byte ChunkSize)
 		{
 			pin_ptr<unsigned char> unmanagedSecretArray = &Secret[StartIndex];
@@ -32,6 +36,7 @@ using namespace System::Threading;
 
 			//cout << "chunkSecret:"<<chunkSecret<<'\n';
 
+			DateTime currentTime = DateTime::Now;
 			//generate prime p
 			ZZ p;
 			RandomPrime(p,ChunkSize*8);
@@ -42,7 +47,8 @@ using namespace System::Threading;
 				RandomPrime(p, ChunkSize * 8);
 			//	cout << "prime:" << p << '\n';
 			}
-
+			TimeSpan tp = DateTime::Now - currentTime;
+			primeGenTime = tp.TotalMilliseconds;
 
 			ZZ_p::init(p);
 			Vec<ZZ> coefficients = vec_ZZ();

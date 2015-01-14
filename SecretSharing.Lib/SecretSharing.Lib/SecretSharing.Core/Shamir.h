@@ -13,6 +13,7 @@ namespace SecretSharingCore
 	namespace Algorithms{
 		public ref class Shamir :ISecretShare{
 		private:
+			unsigned long primeGenTime;
 			static Object^ m_lock = gcnew Object();
 			unsigned long prime;
 			long primeLength = 17;
@@ -28,6 +29,7 @@ namespace SecretSharingCore
 			String^ Shamir::ReconstructStringSecret(List<IShareCollection^>^ shareCollections,Byte ChunkSize);
 			List<IShareCollection^>^ Shamir::DivideSecret(int K, int N, array<Byte>^ Secret, Byte ChunkSize);
 			array<Byte>^  Shamir::ReconstructSecret(List<IShareCollection^>^ shareCollections, Byte ChunkSize);
+			unsigned long Shamir::GetPrimeGenerationTime();
 		};
 	}
 }

@@ -61,7 +61,7 @@ namespace SecretSharing.Benchmark
 
 
 
-        public PerormanceAnalysisForm(List<IEnumerable<SecretSharingBenchmarkReport>> results, List<string> titles, string PlotTitle,string ExportPdfFileName = null)
+        public PerormanceAnalysisForm(List<IEnumerable<SecretSharingBenchmarkReport>> results, List<string> titles, string PlotTitle,bool drawWithoutPrimeTime,string ExportPdfFileName = null)
         {
 
             InitializeComponent();
@@ -69,28 +69,42 @@ namespace SecretSharing.Benchmark
 
             var myModel = new PlotModel { Title = string.Format("Performance Report {0}", PlotTitle) };
             int i = 0;
-            int maxMs = 0;
+            long maxMs = 0;
             if (results.Count == 0) return;
-            int minMs = results[0].FirstOrDefault().avg.Milliseconds;
-            int minN = results[0].FirstOrDefault().n;
-            int maxN = 0;
+            long minMs = results[0].FirstOrDefault().avgTotalMiliseconds;
+            long minN = results[0].FirstOrDefault().n;
+            long maxN = 0;
             foreach (var reports in results)
             {
+                LineSeries lineNoPrimeSeries = null;
                 var lineSeries = new LineSeries(titles[i]);
                 lineSeries.MarkerType = MarkerType.Circle;
                 lineSeries.Smooth = true;
-                
+                if(drawWithoutPrimeTime)
+                {
+                    lineNoPrimeSeries = new LineSeries(titles[i] + " no prime");
+                }
                 foreach (var report in reports)
                 {
-                    if (report.avg.Milliseconds < minMs) minMs = report.avg.Milliseconds;
+                    if (report.avgTotalMiliseconds < minMs) minMs = report.avgTotalMiliseconds;
                     if (report.n < minN) minN = report.n;
                     if (report.n > maxN) maxN = report.n;
-                    if (report.avg.Milliseconds > maxMs) { maxMs = report.avg.Milliseconds; }
-                    lineSeries.Points.Add(new DataPoint(report.n, report.avg.Milliseconds));
+                    if (report.avgTotalMiliseconds > maxMs) { maxMs = report.avgTotalMiliseconds; }
+                    lineSeries.Points.Add(new DataPoint(report.n, report.avgTotalMiliseconds));
+                    if (drawWithoutPrimeTime)
+                    {
+                        if (report.avgTotalMiliseconds - report.primeGenerationTime < minMs) { minMs =report.avgTotalMiliseconds - report.primeGenerationTime; }
+                        if (report.avgTotalMiliseconds - report.primeGenerationTime > maxMs) { maxMs =report.avgTotalMiliseconds - report.primeGenerationTime; }
+                        lineNoPrimeSeries.Points.Add(new DataPoint(report.n, report.avgTotalMiliseconds - report.primeGenerationTime ));
+                    }
                 }
                 if (lineSeries.Points.Count > 0)
                 {
                     myModel.Series.Add(lineSeries);
+                }
+                if (lineNoPrimeSeries != null &&lineNoPrimeSeries.Points.Count > 0)
+                {
+                    myModel.Series.Add(lineNoPrimeSeries);
                 }
                 i++;
             }

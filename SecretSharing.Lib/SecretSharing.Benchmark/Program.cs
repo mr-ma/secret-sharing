@@ -14,14 +14,16 @@ namespace SecretSharing.Benchmark
 
         static void Benchmark256bitKeyWithPDFs()
         {
+            ///define the chunk sizes here for the experiment
             byte[] Chunks = new Byte[]{
             1
             ,2,
-            4
-            ,8
+            4,
+            8
             ,16
             ,32
-            ,64
+            //,64
+            //,128
             };
 
             int[] PerformanceK = new int[] {5,20,50 };
@@ -29,9 +31,11 @@ namespace SecretSharing.Benchmark
             int MaxN = 100;
             int MaxK = 50;
             int step = 5;
-            int iterate = 10;
+            int iterate = 100;
             ShamirAntixBenchmark benchmark = new ShamirAntixBenchmark();
-            String key = benchmark.key512bit;
+            //define the key size to experiment here
+            String key = benchmark.key256bit;
+
             var reports = benchmark.BenchmarkMeWithChunkSize(Chunks, MaxN, MaxK, step, SecretSharingBenchmarkReport.OperationType.ShareGeneration
                  |SecretSharingBenchmarkReport.OperationType.SecretReconstruction
                , key, iterate);
@@ -84,12 +88,12 @@ namespace SecretSharing.Benchmark
             {
                 PerormanceAnalysisForm perfViewer = new PerormanceAnalysisForm(generationPerformanceCurves[l], genTitles[l]
                 , string.Format("Generate KeySize={0}  K={1}", key.Length * 8, PerformanceK[l])
-                , string.Format("perf_gen_K{0}.pdf", PerformanceK[l]));
+                ,true, string.Format("perf_gen_Key{0}bits_K{1}.pdf",key.Length * 8, PerformanceK[l]));
                 //perfViewer.ShowDialog();
 
                 perfViewer = new PerormanceAnalysisForm(reconstructionPerformanceCurves[l], reconTitles[l]
                , string.Format("Reconstruct KeySize={0}  K={1}", key.Length * 8, PerformanceK[l])
-               , string.Format("perf_recon_K{0}.pdf", PerformanceK[l]));
+               ,false, string.Format("perf_recon_Key{0}bits_K{1}.pdf",key.Length * 8, PerformanceK[l]));
                // perfViewer.ShowDialog();
             }
         }

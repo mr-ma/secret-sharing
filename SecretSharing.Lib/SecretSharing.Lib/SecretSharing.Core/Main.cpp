@@ -8,7 +8,7 @@
 #include "Shamir.h"
 #include "string.h"
 #include "ShamirShare.h"
-#include "vld.h"
+//#include "vld.h"
 using namespace System;
 using namespace std;
 using namespace NTL;
