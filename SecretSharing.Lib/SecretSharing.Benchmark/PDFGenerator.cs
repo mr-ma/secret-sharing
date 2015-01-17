@@ -61,7 +61,7 @@ namespace SecretSharing.Benchmark
                        if (val.Count()>0)
                        {
                            var re = val.First();
-                           kcell.AddElement(new Paragraph(re.avg.TotalMilliseconds.ToString("F0")));
+                           kcell.AddElement(new Paragraph(re.TotalElapsedMilliseconds.ToString("F0")));
                        }
                    }
                    cells[k + 1] = kcell;

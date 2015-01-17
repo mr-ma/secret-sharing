@@ -13,23 +13,25 @@ namespace SecretSharingCore
 	namespace Algorithms{
 		public ref class Shamir :ISecretShare{
 		private:
-			unsigned long primeGenTime;
+			double primeGenTime;
 			static Object^ m_lock = gcnew Object();
 			unsigned long prime;
-			long primeLength = 17;
-			const long coefficientLength = 5913;
-			List<IShare^>^ Shamir::DivideSecret(int K, int N, array<Byte>^ Secret, int StartIndex, Byte ChunkSize);
-			array<Byte>^ Shamir::ReconstructSecret(List<IShare^>^ Shares, Byte ChunkSize);
+			List<IShare^>^ Shamir::DivideSecret(int K, int N, array<Byte>^ Secret, int StartIndex, int ChunkSize,Nullable<double>% TimeElapsedForPrimeGeneration);
+			array<Byte>^ Shamir::ReconstructSecret(List<IShare^>^ Shares, int ChunkSize);
 			ZZ_p Shamir::InterpolateSecret(List<IShare^>^ Shares);
 		public:
 			Shamir::Shamir();
 			List<IShareCollection^>^ Shamir::DivideSecret(int K, int N, long Secret);
 			long Shamir::ReconstructSecret(List<IShareCollection^>^ Shares);
-			List<IShareCollection^>^ Shamir::DivideStringSecret(int K, int N, String^ Secret,Byte ChunkSize);
-			String^ Shamir::ReconstructStringSecret(List<IShareCollection^>^ shareCollections,Byte ChunkSize);
-			List<IShareCollection^>^ Shamir::DivideSecret(int K, int N, array<Byte>^ Secret, Byte ChunkSize);
-			array<Byte>^  Shamir::ReconstructSecret(List<IShareCollection^>^ shareCollections, Byte ChunkSize);
-			unsigned long Shamir::GetPrimeGenerationTime();
+			List<IShareCollection^>^ Shamir::DivideStringSecret(int K, int N, String^ Secret,int ChunkSize);
+			String^ Shamir::ReconstructStringSecret(List<IShareCollection^>^ shareCollections,int ChunkSize);
+			List<IShareCollection^>^ Shamir::DivideSecret(int K, int N, array<Byte>^ Secret, int ChunkSize
+				,[System::Runtime::InteropServices::Optional]
+				[System::Runtime::InteropServices::DefaultParameterValue(NULL)]
+				Nullable<double>% TimeElapsedForPrimeGeneration
+				);
+			array<Byte>^  Shamir::ReconstructSecret(List<IShareCollection^>^ shareCollections, int ChunkSize);
+			double Shamir::GetPrimeGenerationTime();
 		};
 	}
 }

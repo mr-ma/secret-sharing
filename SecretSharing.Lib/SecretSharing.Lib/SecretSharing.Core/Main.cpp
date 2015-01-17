@@ -33,7 +33,8 @@ void runByteChunkShare(){
 	String^ secret = "1234567812345678";
 	array<Byte>^ bytes = Encoding::UTF8->GetBytes(secret->ToCharArray());
 	Shamir^ secretshare = gcnew Shamir();
-	List<IShareCollection^>^ shares = secretshare->DivideSecret(k, n, bytes,chunkSize);
+	Nullable<double> a = NULL;
+	List<IShareCollection^>^ shares = secretshare->DivideSecret(k, n, bytes,chunkSize,a);
 	//List<IShareCollection^>^ sharesStr = secretshare->DivideSecret(k, n,secret);
 	delete bytes;
 	for (int i = 0; i < k; i++)

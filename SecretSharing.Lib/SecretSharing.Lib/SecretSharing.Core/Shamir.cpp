@@ -22,14 +22,15 @@ using namespace System::Threading;
 			array<Byte>^ arrayOfByte = BitConverter::GetBytes(Secret);
 			/*if (BitConverter::IsLittleEndian)
 				Array::Reverse(arrayOfByte);*/
-			return DivideSecret(K, N, arrayOfByte ,(Byte)size);
+			Nullable<double> a = NULL;
+			return DivideSecret(K, N, arrayOfByte ,(Byte)size,a);
 		}
 
-		unsigned long Shamir::GetPrimeGenerationTime(){
+		double Shamir::GetPrimeGenerationTime(){
 			return this->primeGenTime;
 		}
-
-		List<IShare^>^ Shamir::DivideSecret(int K, int N, array<Byte>^ Secret, int StartIndex,Byte ChunkSize)
+		
+		List<IShare^>^ Shamir::DivideSecret(int K, int N, array<Byte>^ Secret, int StartIndex, int ChunkSize, Nullable<double>% TimeElapsedForPrimeGeneration)
 		{
 			pin_ptr<unsigned char> unmanagedSecretArray = &Secret[StartIndex];
 			ZZ chunkSecret = ZZFromBytes(unmanagedSecretArray, ChunkSize);
@@ -37,22 +38,26 @@ using namespace System::Threading;
 			//cout << "chunkSecret:"<<chunkSecret<<'\n';
 
 			DateTime currentTime = DateTime::Now;
+			
+
+			//Monitor::Enter(m_lock);
 			//generate prime p
-			ZZ p;
-			RandomPrime(p,ChunkSize*8);
+			ZZ p = RandomPrime_ZZ((ChunkSize*8)+1);
 
 			//cout << "prime:" << p << '\n';
 			//cout << "prime number is:" << p << '\n';
 			while (p < chunkSecret){
-				RandomPrime(p, ChunkSize * 8);
+				RandomPrime(p, (ChunkSize * 8) + 1);
 			//	cout << "prime:" << p << '\n';
 			}
+			//Monitor::Exit(m_lock);
+
 			TimeSpan tp = DateTime::Now - currentTime;
 			primeGenTime = tp.TotalMilliseconds;
+			if (TimeElapsedForPrimeGeneration.HasValue) TimeElapsedForPrimeGeneration = tp.TotalMilliseconds;
 
 			ZZ_p::init(p);
 			Vec<ZZ> coefficients = vec_ZZ();
-			ZZ maxRandom = ZZ(coefficientLength);
 			ZZ_pX f;
 			f.SetLength(K);
 			SetCoeff(f, 0, to_ZZ_p(chunkSecret));
@@ -85,7 +90,7 @@ using namespace System::Threading;
 			return shares;
 		}
 
-		List<IShareCollection^>^ Shamir::DivideSecret(int K, int N, array<Byte>^ Secret, Byte ChunkSize)
+		List<IShareCollection^>^ Shamir::DivideSecret(int K, int N, array<Byte>^ Secret, int ChunkSize, Nullable<Double>% TimeElapsedForPrimeGeneration)
 		{
 			if (Secret->Length % ChunkSize != 0)
 			{
@@ -94,7 +99,7 @@ using namespace System::Threading;
 			List<IShareCollection^>^ shares = gcnew List<IShareCollection^>();
 			for (int i = 0; i*ChunkSize <Secret->Length; i++)
 			{
-				List<IShare^>^ currentLetterShares = DivideSecret(K, N, Secret, i*ChunkSize, ChunkSize);
+				List<IShare^>^ currentLetterShares = DivideSecret(K, N, Secret, i*ChunkSize, ChunkSize, TimeElapsedForPrimeGeneration);
 				ShareCollection::ScatterShareIntoCollection(currentLetterShares, shares, i);
 			}
 			return shares;
@@ -114,12 +119,13 @@ using namespace System::Threading;
 			return BitConverter::ToInt32(resultArray, 0);
 		}
 		
-		List<IShareCollection^>^ Shamir::DivideStringSecret(int K, int N, String^ Secret,Byte ChunkSize){
+		List<IShareCollection^>^ Shamir::DivideStringSecret(int K, int N, String^ Secret,int ChunkSize){
 			List<IShareCollection^>^ shares = gcnew List<IShareCollection^>();
 			array<Byte>^ bytes = Encoding::UTF8->GetBytes(Secret->ToCharArray());
-			return DivideSecret(K, N, bytes, ChunkSize);
+			Nullable<double> a = NULL;
+			return DivideSecret(K, N, bytes, ChunkSize,a);
 		}
-		String^ Shamir::ReconstructStringSecret(List<IShareCollection^>^ shareCollections,Byte ChunkSize){
+		String^ Shamir::ReconstructStringSecret(List<IShareCollection^>^ shareCollections,int ChunkSize){
 			array<Byte>^ secret = ReconstructSecret(shareCollections,ChunkSize);
 			return Encoding::UTF8->GetString(secret);
 
@@ -154,7 +160,7 @@ using namespace System::Threading;
 			return secretz;
 		}
 		
-		array<Byte>^ Shamir::ReconstructSecret(List<IShare^>^ Shares, Byte ChunkSize){
+		array<Byte>^ Shamir::ReconstructSecret(List<IShare^>^ Shares, int ChunkSize){
 
 			ZZ_p secretz =InterpolateSecret(Shares);
 			ZZ secret;
@@ -167,7 +173,7 @@ using namespace System::Threading;
 			delete unmanagedSecretArray;
 			return _Data;
 		}
-		array<Byte>^  Shamir::ReconstructSecret(List<IShareCollection^>^ shareCollections,Byte ChunkSize){
+		array<Byte>^  Shamir::ReconstructSecret(List<IShareCollection^>^ shareCollections,int ChunkSize){
 			int count = shareCollections[0]->GetCount();
 			array<Byte>^ secret = gcnew array<Byte>(count*ChunkSize);
 			for (int i = 0; i < count; i++)

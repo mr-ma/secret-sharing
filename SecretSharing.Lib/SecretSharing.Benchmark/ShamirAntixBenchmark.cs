@@ -17,23 +17,23 @@ namespace SecretSharing.Benchmark
             ShareGeneration = 1,
             SecretReconstruction = 2,
         }
-        public byte chunkSize;
+        public int chunkSize;
         public int n;
         public int k;
-        public TimeSpan avg;
+        public double TotalElapsedMilliseconds;
         public int keyLength;
         public OperationType Operation;
-        public long primeGenerationTime;
-        public long avgTotalMiliseconds
-        {
-            get
-            {
-                return Convert.ToInt64(this.avg.TotalMilliseconds);
-            }
-        }
+        public double primeGenerationTime;
+        //public long avgTotalMiliseconds
+        //{
+        //    get
+        //    {
+        //        return Convert.ToInt64(this.TotalElapsedMilliseconds);
+        //    }
+        //}
         public override string ToString()
         {
-            return String.Format("keylength:{0} chunkSize:{1}  n:{2} k:{3}  avg:{4} Operation: {5}", keyLength, chunkSize, n, k, avg, Operation.ToString());
+            return String.Format("keylength:{0} chunkSize:{1}  n:{2} k:{3}  avg:{4} Operation: {5}", keyLength, chunkSize, n, k, TotalElapsedMilliseconds, Operation.ToString());
         }
     }
     public class ShamirAntixBenchmark
@@ -42,7 +42,9 @@ namespace SecretSharing.Benchmark
             ,"1234567812345678"
             ,"12345678123456781234567812345678"
             ,"1234567812345678123456781234567812345678123456781234567812345678"
-            ,"12345678123456781234567812345678123456781234567812345678123456781234567812345678123456781234567812345678123456781234567812345678"
+            //,"12345678123456781234567812345678123456781234567812345678123456781234567812345678123456781234567812345678123456781234567812345678"
+        //,"1234567812345678123456781234567812345678123456781234567812345678123456781234567812345678123456781234567812345678123456781234567812345678123456781234567812345678123456781234567812345678123456781234567812345678123456781234567812345678123456781234567812345678"
+       
         };
 
         public String key64bit = "12345678";
@@ -53,7 +55,7 @@ namespace SecretSharing.Benchmark
         public String key1024bit = "12345678123456781234567812345678123456781234567812345678123456781234567812345678123456781234567812345678123456781234567812345678";
 
 
-        public IEnumerable<SecretSharingBenchmarkReport> BenchmarkAllKeysWithChunkSize(byte[] chunkSize, 
+        public IEnumerable<SecretSharingBenchmarkReport> BenchmarkAllKeysWithChunkSize(int[] chunkSize, 
             int MaxN, int MaxK, int step, 
             SecretSharingBenchmarkReport.OperationType operation,
              int iterate = 1)
@@ -65,64 +67,78 @@ namespace SecretSharing.Benchmark
             }
             return reports;
         }
+        object lockMe = new object();
         public IEnumerable<SecretSharingBenchmarkReport> BenchmarkKeyWithChunkSize(
-            byte[] chunkSize, int MaxN, int MaxK, int step, 
+            int[] chunkSize, int MaxN, int MaxK, int step,
             SecretSharingBenchmarkReport.OperationType operation, string key = "12345678", int iterate = 1)
         {
             List<SecretSharingBenchmarkReport> results = new List<SecretSharingBenchmarkReport>();
 
-            for (int n = 5; n <= MaxN; n += step)
-            {
-                //k can not be bigger than n
-                for (int k = 1; k <= n && k <= MaxK; )
+            //Parallel.For(5, MaxN, n =>
+            //{
+                for (int n = 5; n <= MaxN; n += step)
                 {
+                //k can not be bigger than n
 
-                    for (int iteratechunk = 0; iteratechunk < chunkSize.Length; iteratechunk++)
+                //Parallel.For(1, MaxK, k =>
+                //{
+                    for (int k = 1; k <= n && k <= MaxK; )
                     {
-                        ///skip if the chunk is bigger than the secret
-                        if (chunkSize[iteratechunk] > key.Length * 8) break;
 
-                        List<IShareCollection> shares = null;
-                        //if (operation.HasFlag(SecretSharingBenchmarkReport.OperationType.ShareGeneration))
-                        //{
-                        long primeTime = 0;
-
-                        var redivide = Antix.Testing.Benchmark.Run(() =>
-                           shares = DivideSecretWithChunkSizeWrapper(n, k, chunkSize[iteratechunk], key, ref primeTime/*keys[i]*/)
-                           , iterate);
-
-                        results.Add(new SecretSharingBenchmarkReport()
+                        for (int iteratechunk = 0; iteratechunk < chunkSize.Length; iteratechunk++)
                         {
-                            n = n,
-                            chunkSize = chunkSize[iteratechunk],
-                            k = k,
-                            avg = redivide.Average,
-                            keyLength = key/*s[i]*/.Length * 8,
-                            Operation = SecretSharingBenchmarkReport.OperationType.ShareGeneration,
-                            primeGenerationTime = primeTime / iterate
-                        });
-                        //}
-                        if (operation.HasFlag(SecretSharingBenchmarkReport.OperationType.SecretReconstruction))
-                        {
-                            var reconstruct = Antix.Testing.Benchmark.Run(() =>
-                          ReconstructSecretWithChunkSizeWrapper(shares, k, chunkSize[iteratechunk])
-                          , iterate);
-                            results.Add(new SecretSharingBenchmarkReport()
+                            ///skip if the chunk is bigger than the secret
+                            if (chunkSize[iteratechunk] * 8 > key.Length * 8) break;
+
+                            List<IShareCollection> shares = null;
+                            //if (operation.HasFlag(SecretSharingBenchmarkReport.OperationType.ShareGeneration))
+                            //{
+                            double primeTime = 0;
+
+                            var redivide = Antix.Testing.Benchmark.Run(() =>
+                               shares = DivideSecretWithChunkSizeWrapper(n, k, chunkSize[iteratechunk], key, ref primeTime/*keys[i]*/)
+                               , iterate);
+                            //In the function
+                            lock (lockMe)
                             {
-                                n = n,
-                                chunkSize = chunkSize[iteratechunk],
-                                k = k,
-                                avg = reconstruct.Average,
-                                keyLength = key/*s[i]*/.Length * 8,
-                                Operation = SecretSharingBenchmarkReport.OperationType.SecretReconstruction
-                            });
+                                results.Add(new SecretSharingBenchmarkReport()
+                                {
+                                    n = n,
+                                    chunkSize = chunkSize[iteratechunk],
+                                    k = k,
+                                    TotalElapsedMilliseconds = redivide.Average.TotalMilliseconds,
+                                    keyLength = key/*s[i]*/.Length * 8,
+                                    Operation = SecretSharingBenchmarkReport.OperationType.ShareGeneration,
+                                    primeGenerationTime = primeTime / iterate
+                                });
+                            }
+                            //}
+                            if (operation.HasFlag(SecretSharingBenchmarkReport.OperationType.SecretReconstruction))
+                            {
+                                var reconstruct = Antix.Testing.Benchmark.Run(() =>
+                              ReconstructSecretWithChunkSizeWrapper(shares, k, chunkSize[iteratechunk])
+                              , iterate);
+                                lock (lockMe)
+                                {
+                                    results.Add(new SecretSharingBenchmarkReport()
+                                    {
+                                        n = n,
+                                        chunkSize = chunkSize[iteratechunk],
+                                        k = k,
+                                        TotalElapsedMilliseconds = reconstruct.Average.TotalMilliseconds,
+                                        keyLength = key/*s[i]*/.Length * 8,
+                                        Operation = SecretSharingBenchmarkReport.OperationType.SecretReconstruction
+                                    });
+                                }
+                            }
+                            Console.WriteLine("Iteration info: n:{0} k:{1} keySize:{2} chunkSize(bits):{3}", n, k, key/*s[i]*/.Length * 8, chunkSize[iteratechunk] * 8);
                         }
-                        Console.WriteLine("Iteration info: n:{0} k:{1} keySize:{2} chunkSize(bits):{3}", n, k, key/*s[i]*/.Length * 8, chunkSize[iteratechunk] * 8);
+                        if (k == 1) k = step;
+                        else k += step;
                     }
-                    if (k == 1) k = step;
-                    else k += step;
-                }
-            }
+                    //}
+                //});
+            }//);
             var orderedResults = results.OrderBy(po => po.keyLength).ThenBy(po => po.n).ThenBy(po => po.k).ThenBy(po => po.chunkSize);
 
 
@@ -131,17 +147,17 @@ namespace SecretSharing.Benchmark
 
 
   
-        public List<IShareCollection> DivideSecretWithChunkSizeWrapper(int n, int k, byte ChunkSize, String Secret, ref long PrimeGenerationTime)
+        public List<IShareCollection> DivideSecretWithChunkSizeWrapper(int n, int k, int ChunkSize, String Secret, ref double PrimeGenerationTime)
         {
             SecretSharingCore.Algorithms.Shamir shamir = new SecretSharingCore.Algorithms.Shamir();
             var byteSecret = Encoding.UTF8.GetBytes(Secret.ToCharArray());
-
-            var a = shamir.DivideSecret(k, n, byteSecret, ChunkSize);
+            double? primeElapsed = 0;
+            var a = shamir.DivideSecret(k, n, byteSecret, ChunkSize,ref primeElapsed);
             PrimeGenerationTime += shamir.GetPrimeGenerationTime();
             return a;
         }
 
-        public void ReconstructSecretWithChunkSizeWrapper(List<IShareCollection> shares, int k, byte chunkSize)
+        public void ReconstructSecretWithChunkSizeWrapper(List<IShareCollection> shares, int k, int chunkSize)
         {
             SecretSharingCore.Algorithms.Shamir shamir = new SecretSharingCore.Algorithms.Shamir();
             //assign

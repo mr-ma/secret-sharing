@@ -13,8 +13,9 @@ namespace SecretSharing.Benchmark
 
         static void HandleReports(PersistanceReport report)
         {
-            int[] PerformanceK = new int[] { 5, 20, 50 };
+            //group by key and handle for each key following outputs
 
+            int[] PerformanceK = new int[] { 5, 20, 50 };
             var filteredreconrep = report.Reports.Where(po => po.Operation == SecretSharingBenchmarkReport.OperationType.SecretReconstruction);
             var filteredgenrep = report.Reports.Where(po => po.Operation == SecretSharingBenchmarkReport.OperationType.ShareGeneration);
             PDFGenerator pdfreport = new PDFGenerator();
@@ -62,13 +63,21 @@ namespace SecretSharing.Benchmark
             for (int l = 0; l < PerformanceK.Length; l++)
             {
                 PerormanceAnalysisForm perfViewer = new PerormanceAnalysisForm(generationPerformanceCurves[l], genTitles[l]
-                , string.Format("Generate KeySize={0}  K={1}", report.KeySize, PerformanceK[l])
-                , true, string.Format("perf_gen_Key{0}bits_K{1}.pdf", report.KeySize, PerformanceK[l]));
+                , string.Format("Generate no prime KeySize={0}  K={1} ", report.KeySize, PerformanceK[l])
+                , true, false, string.Format("perf_NoPrime_gen_Key{0}bits_K{1}.pdf", report.KeySize, PerformanceK[l]));
+
+                perfViewer = new PerormanceAnalysisForm(generationPerformanceCurves[l], genTitles[l]
+              , string.Format("Generate KeySize={0}  K={1}", report.KeySize, PerformanceK[l])
+              , false, true, string.Format("perf_Prime_gen_Key{0}bits_K{1}.pdf", report.KeySize, PerformanceK[l]));
+
+                perfViewer = new PerormanceAnalysisForm(generationPerformanceCurves[l], genTitles[l]
+      , string.Format("Generate timeKeySize={0}  K={1}", report.KeySize, PerformanceK[l])
+      , true, true, string.Format("perf_PrimeAndNoPrime_gen_Key{0}bits_K{1}.pdf", report.KeySize, PerformanceK[l]));
                 //perfViewer.ShowDialog();
 
                 perfViewer = new PerormanceAnalysisForm(reconstructionPerformanceCurves[l], reconTitles[l]
                , string.Format("Reconstruct KeySize={0}  K={1}", report.KeySize, PerformanceK[l])
-               , false, string.Format("perf_recon_Key{0}bits_K{1}.pdf", report.KeySize, PerformanceK[l]));
+               , false, true, string.Format("perf_recon_Key{0}bits_K{1}.pdf", report.KeySize, PerformanceK[l]));
                 // perfViewer.ShowDialog();
             }
         }
@@ -76,7 +85,7 @@ namespace SecretSharing.Benchmark
         static string BenchmarkToPersistenceStorage()
         {
             ///define the chunk sizes here for the experiment
-            byte[] Chunks = new Byte[]{
+            int[] Chunks = new int[]{
             1
             ,2,
             4,
@@ -85,14 +94,15 @@ namespace SecretSharing.Benchmark
             ,32
             ,64
             ,128
+            ,256
             };
 
           
 
-            int MaxN = 10;
-            int MaxK = 10;
+            int MaxN = 100;
+            int MaxK = 60;
             int step = 5;
-            int iterate = 1;
+            int iterate = 100;
             ShamirAntixBenchmark benchmark = new ShamirAntixBenchmark();
             //define the key size to experiment here
             //String key = benchmark.key256bit;
@@ -119,10 +129,26 @@ namespace SecretSharing.Benchmark
         static void Main(string[] args)
         {
             
-            var filePath = BenchmarkToPersistenceStorage();
+            //var filePath = BenchmarkToPersistenceStorage();
             var ser = new XMLSerializer<PersistanceReport>();
+            var filePath = "SerializedReports-n100-k60-iterate100.xml";
             var report = ser.Deserialize(filePath);
-            HandleReports(report);
+            var rep = from r in report.Reports
+              group r by r.keyLength into g
+              select g;
+            foreach (var item in rep)
+            {
+                PersistanceReport grep = new PersistanceReport();
+                grep.Reports = item.ToList();
+                grep.KeySize = item.Key;
+                grep.N = report.N;
+                grep.K = report.K;
+                grep.Step = report.Step;
+                grep.Iterate = report.Iterate;
+
+                HandleReports(grep);
+            }
+           
 
             Console.ReadLine();
             //Application.Run();
