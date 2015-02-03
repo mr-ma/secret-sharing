@@ -8,6 +8,10 @@
 #include "Shamir.h"
 #include "string.h"
 #include "ShamirShare.h"
+#include "BenalohLeichter.h"
+#include "AccessStructure.h"
+#include "Trustee.h"
+#include "ISecretShare.h"
 //#include "vld.h"
 using namespace System;
 using namespace std;
@@ -15,6 +19,7 @@ using namespace NTL;
 using namespace System::Collections::Generic;
 using namespace SecretSharingCore::Algorithms;
 using namespace SecretSharingCore::Common;
+using namespace SecretSharingCore::Algorithms::GeneralizedAccessStructure;
 
 void MarshalString(String ^ s, string& os)
 {
@@ -68,6 +73,13 @@ void runByteChunkShare(){
 }
 
 
+void PrintIShares(List<IShare^>^ shares){
+	for (int j = 0; j < shares-> Count; j++)
+	{
+		Console::WriteLine(shares[j]->ToString());
+	}
+}
+
 int main(array<System::String ^> ^args)
 {
 	//_CrtSetReportMode(_CRT_ERROR, _CRTDBG_MODE_DEBUG);
@@ -95,7 +107,7 @@ int main(array<System::String ^> ^args)
 	ZZ_pX interpolatedf = interpolate(x, y);
 	cout << "interpol g(x):" << interpolatedf;*/
 
-	runByteChunkShare();
+	//runByteChunkShare();
 
 	//IShare^ sharezz = gcnew ShamirShare(1, &ZZ_p(2));
 
@@ -188,5 +200,25 @@ int main(array<System::String ^> ^args)
 
 	cout << factors << "\n";
 	*/	//_CrtDumpMemoryLeaks(); 
+Trustee^ personA = gcnew Trustee(1);
+Trustee^ personB = gcnew Trustee(2);
+
+QualifiedSubset^ set = gcnew QualifiedSubset();
+set->Parties = gcnew List<Trustee^>();
+set->Parties->Add(personA);
+set->Parties->Add(personB);
+
+AccessStructure^ access = gcnew AccessStructure();
+access->Accesses = gcnew List<QualifiedSubset^>();
+access->Accesses->Add(set);
+
+
+BenalohLeichter^ ben = gcnew BenalohLeichter();
+	String^ secret = "1234567812345678";
+	array<Byte>^ bytes = Encoding::UTF8->GetBytes(secret->ToCharArray());
+
+	List<IShare^>^ shares=  ben->DivideSecret(bytes, access);
+	PrintIShares(shares);
+
 	Console::Read();
 }

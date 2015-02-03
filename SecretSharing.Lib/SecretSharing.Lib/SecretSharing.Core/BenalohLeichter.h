@@ -7,16 +7,17 @@ using namespace System;
 using namespace System::Collections::Generic;
 using namespace std;
 using namespace SecretSharingCore::Common;
-using namespace SecretSharingCore::Algorithms::BenalohLeichter;
 namespace SecretSharingCore
 {
 	namespace Algorithms{
-		public ref class BenalohLeichter :ISecretShare{
-		public:
-			BenalohLeichter::BenalohLeichter();
-			List<IShareCollection^>^ BenalohLeichter::DivideSecret(array<Byte>^ Secret, AccessStructure accessStructure);
-			array<Byte>^  BenalohLeichter::ReconstructSecret(List<IShareCollection^>^ shares);
-		};
+		namespace GeneralizedAccessStructure{
+			public ref class BenalohLeichter : ISecretShare{
+			public:
+				BenalohLeichter::BenalohLeichter();
+				List<IShare^>^ BenalohLeichter::DivideSecret(array<Byte>^ Secret, AccessStructure^ accessStructure);
+				array<Byte>^  BenalohLeichter::ReconstructSecret(List<IShare^>^ shares);
+			};
+		}
 	}
 }
 
