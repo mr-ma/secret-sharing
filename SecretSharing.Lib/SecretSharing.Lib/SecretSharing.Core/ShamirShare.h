@@ -1,8 +1,15 @@
 #pragma once
 #include "stdafx.h"
 #include "NativePtr.h"
+#include "NTL\ZZ.h"
+#include "NTL\ZZ_p.h"
+#include <vector>
+#include "ISecretShare.h"
 using namespace SecretSharingCore::Common;
 using namespace System::Text;
+using namespace NTL;
+using namespace System;
+
 namespace SecretSharingCore
 {
 	namespace Common
@@ -79,7 +86,7 @@ namespace SecretSharingCore
 				String^ strShare = Convert::ToBase64String(GetY());
 				StringBuilder^ builder = gcnew StringBuilder();
 				builder->AppendFormat("X:{0} y:{1} ySize:{2} yarraySize:{3} p:{4}", GetX(), strPrime, (*_prime).MaxAlloc(),
-					GetY().Length,strShare);
+					this->GetY().Length,strShare);
 				return builder->ToString();
 			}
 		

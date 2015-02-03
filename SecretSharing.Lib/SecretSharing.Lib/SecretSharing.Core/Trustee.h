@@ -1,7 +1,6 @@
 #pragma once
 #include "stdafx.h"
 #include "IShareCollection.h"
-#include "Trustee.h"
 using namespace System;
 using namespace System::Collections::Generic;
 using namespace std;
@@ -12,10 +11,18 @@ namespace SecretSharingCore
 	namespace Algorithms
 	{
 		namespace GeneralizedAccessStructure{
-			public ref class QualifiedSubset{
+			public ref class Trustee{
+			private :
+				int partyId;
 			public:
-				QualifiedSubset::QualifiedSubset();
-				List<Trustee^>^ Parties;
+				List<IShare^>^ Shares;
+
+				Trustee::Trustee(int id);
+				int GetPartyId();
+				void Trustee::AddShare(IShare^ share);
+				virtual bool Equals(Object^ o) override;
+				virtual int GetHashCode() override;
+				
 			};
 		}
 	}
