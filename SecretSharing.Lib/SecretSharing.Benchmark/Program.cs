@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.IO;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
@@ -128,30 +129,53 @@ namespace SecretSharing.Benchmark
        // [STAThread]
         static void Main(string[] args)
         {
-            
-            //var filePath = BenchmarkToPersistenceStorage();
-            var ser = new XMLSerializer<PersistanceReport>();
-            var filePath = "SerializedReports-n100-k60-iterate100.xml";
-            var report = ser.Deserialize(filePath);
-            var rep = from r in report.Reports
-              group r by r.keyLength into g
-              select g;
-            foreach (var item in rep)
-            {
-                PersistanceReport grep = new PersistanceReport();
-                grep.Reports = item.ToList();
-                grep.KeySize = item.Key;
-                grep.N = report.N;
-                grep.K = report.K;
-                grep.Step = report.Step;
-                grep.Iterate = report.Iterate;
 
-                HandleReports(grep);
+            if (args.Length == 0) {printHelp(); return ;}
+            string op = args[0].Trim().ToLower();
+            var filePath ="";
+
+            if (op == "benchmark")
+            {
+                filePath = BenchmarkToPersistenceStorage();
+                Console.WriteLine(string.Format("Benchmarking is done!\nResults are dumped to {0}", filePath));
             }
-           
+            if (op == "report")
+            {
+                if (args.Length == 1 || string.IsNullOrEmpty( args[1]) || !File.Exists(args[1])) {
+                    printHelp();
+                    return ;
+                }
+                filePath = args[1];
+
+                var ser = new XMLSerializer<PersistanceReport>();
+                //var filePath = "SerializedReports-n100-k60-iterate100.xml";
+                var report = ser.Deserialize(filePath);
+                var rep = from r in report.Reports
+                          group r by r.keyLength into g
+                          select g;
+                foreach (var item in rep)
+                {
+                    PersistanceReport grep = new PersistanceReport();
+                    grep.Reports = item.ToList();
+                    grep.KeySize = item.Key;
+                    grep.N = report.N;
+                    grep.K = report.K;
+                    grep.Step = report.Step;
+                    grep.Iterate = report.Iterate;
+
+                    HandleReports(grep);
+                }
+                Console.WriteLine("Report files are generated in current path... Old files has been replaced.");
+            }
 
             Console.ReadLine();
             //Application.Run();
+        }
+
+        static void printHelp()
+        {
+            Console.WriteLine("Instruction to use the benchmarker:\napp benchmark: to run benchmark tests\napp report filepath: to generate pdf & report files\nPress any keys to exit..");
+            Console.ReadLine();
         }
     }
 }
