@@ -29,3 +29,7 @@ int Trustee::GetPartyId(){
 void Trustee::AddShare(IShare^ share){
 	//TODO: to be added
 }
+
+String^  Trustee::ToString(){
+	return "P" + this->partyId.ToString()+" r:"+Math::Round( SecretSharePercentage*100);
+}

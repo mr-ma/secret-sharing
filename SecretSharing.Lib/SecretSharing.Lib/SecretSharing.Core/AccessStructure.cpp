@@ -9,4 +9,5 @@ using namespace SecretSharingCore::Common;
 using namespace SecretSharingCore::Algorithms::GeneralizedAccessStructure;
 
 AccessStructure::AccessStructure(){
+	this->Accesses = gcnew List<QualifiedSubset^>();
 }

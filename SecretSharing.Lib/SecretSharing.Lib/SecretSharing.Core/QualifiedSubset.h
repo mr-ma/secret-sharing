@@ -14,8 +14,11 @@ namespace SecretSharingCore
 		namespace GeneralizedAccessStructure{
 			public ref class QualifiedSubset{
 			public:
-				QualifiedSubset::QualifiedSubset();
+				QualifiedSubset :: QualifiedSubset();
 				List<Trustee^>^ Parties;
+				virtual bool Equals(Object^ o) override;
+				virtual int GetHashCode() override;
+				void AssignSecretPercentage();
 			};
 		}
 	}

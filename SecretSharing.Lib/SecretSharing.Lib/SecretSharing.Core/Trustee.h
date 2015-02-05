@@ -13,15 +13,19 @@ namespace SecretSharingCore
 		namespace GeneralizedAccessStructure{
 			public ref class Trustee{
 			private :
-				int partyId;
+				
 			public:
+				int partyId;
 				List<IShare^>^ Shares;
+				double SecretSharePercentage;
+				double SeenRate;
 
 				Trustee::Trustee(int id);
 				int GetPartyId();
 				void Trustee::AddShare(IShare^ share);
 				virtual bool Equals(Object^ o) override;
 				virtual int GetHashCode() override;
+				virtual String^ ToString() override;
 				
 			};
 		}
