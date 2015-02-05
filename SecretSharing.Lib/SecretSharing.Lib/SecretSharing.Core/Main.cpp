@@ -200,13 +200,19 @@ int main(array<System::String ^> ^args)
 
 	cout << factors << "\n";
 	*/	//_CrtDumpMemoryLeaks(); 
+
+
 Trustee^ personA = gcnew Trustee(1);
 Trustee^ personB = gcnew Trustee(2);
+Trustee^ personC = gcnew Trustee(3);
+Trustee^ personD = gcnew Trustee(3);
 
 QualifiedSubset^ set = gcnew QualifiedSubset();
 set->Parties = gcnew List<Trustee^>();
 set->Parties->Add(personA);
 set->Parties->Add(personB);
+set->Parties->Add(personC);
+set->Parties->Add(personD);
 
 AccessStructure^ access = gcnew AccessStructure();
 access->Accesses = gcnew List<QualifiedSubset^>();
@@ -219,6 +225,9 @@ BenalohLeichter^ ben = gcnew BenalohLeichter();
 
 	List<IShare^>^ shares=  ben->DivideSecret(bytes, access);
 	PrintIShares(shares);
+
+	array<Byte>^ reconbytes = ben->ReconstructSecret(shares);
+	Console::WriteLine("Secret:" + Encoding::UTF8->GetString(reconbytes));
 
 	Console::Read();
 }
