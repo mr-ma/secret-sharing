@@ -2,6 +2,7 @@
 #include "stdafx.h"
 #include "IShareCollection.h"
 #include "QualifiedSubset.h"
+#include "Trustee.h"
 using namespace std;
 using namespace System;
 using namespace System::Collections::Generic;
@@ -15,7 +16,9 @@ namespace SecretSharingCore
 			public ref class AccessStructure{
 			public:
 				AccessStructure::AccessStructure();
+				AccessStructure::AccessStructure(String^ minimalAccessPath);
 				List<QualifiedSubset^>^  Accesses;
+				List<Trustee^>^ AccessStructure::GetAllParties();
 			};
 		}
 	}

@@ -10,7 +10,14 @@ using namespace SecretSharingCore::Algorithms::GeneralizedAccessStructure;
 Trustee::Trustee(int id){
 	this->partyId = id;
 }
-
+Trustee::Trustee(String^ id){
+	try{
+		this->partyId = Int32::Parse(id->Replace("P","")->Replace("p",""));
+	}
+	catch (Exception^ exc){
+		throw gcnew Exception("Invalid party id use only numbers");
+	}
+}
 bool Trustee::Equals(Object^ obj) { // no "override" here 
 	if (obj == nullptr || GetType() != obj->GetType())
 		return false;
@@ -31,5 +38,5 @@ void Trustee::AddShare(IShare^ share){
 }
 
 String^  Trustee::ToString(){
-	return "P" + this->partyId.ToString()+" r:"+Math::Round( SecretSharePercentage*100);
+	return "P" + this->partyId.ToString();
 }

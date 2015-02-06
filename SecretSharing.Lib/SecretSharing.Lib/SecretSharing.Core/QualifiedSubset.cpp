@@ -6,11 +6,25 @@ using namespace System::Collections::Generic;
 using namespace std;
 using namespace SecretSharingCore::Common;
 using namespace SecretSharingCore::Algorithms::GeneralizedAccessStructure;
+using namespace System::Linq;
 
 QualifiedSubset::QualifiedSubset(){
 	this->Parties = gcnew List<Trustee^>();
 }
-
+QualifiedSubset::QualifiedSubset(String^ subset){
+	this->Parties = gcnew List<Trustee^>();
+	try{
+		array<String^>^ parties = subset->Split('^');
+		for each (String^ p in parties)
+		{
+			Trustee^ partyObj = gcnew Trustee(p);
+			this->Parties->Add(partyObj);
+		}
+	}
+	catch (Exception^ ex) {
+		throw gcnew System::Exception("Invalid Qualified subset example of valid subset: 1^2^3");
+	}
+}
 bool QualifiedSubset::Equals(Object^ obj) { // no "override" here 
 	if (obj == nullptr || GetType() != obj->GetType())
 		return false;
@@ -36,9 +50,13 @@ int QualifiedSubset::GetHashCode() { // no "override" here
 	return re;
 }
 
-void QualifiedSubset::AssignSecretPercentage(){
-	for each (Trustee^ var in Parties)
-	{
-		var->SecretSharePercentage = 1/Parties->Count;
-	}
+
+String^  QualifiedSubset::ToString(){
+	IEnumerable<String^>^ stringified = Enumerable::Select(this->Parties, gcnew Func<Trustee^, String^>(&Trustee::ToString));
+	Func<String^, String^, String^>^ func = gcnew Func < String^, String^, String^ >(this, &QualifiedSubset::aggreagate);
+	return Enumerable::Aggregate(stringified,func);
+}
+
+String^ QualifiedSubset::aggreagate(String^ current, String^ next){
+	return current + "," + next;
 }

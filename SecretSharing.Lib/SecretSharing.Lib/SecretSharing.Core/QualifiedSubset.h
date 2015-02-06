@@ -15,10 +15,14 @@ namespace SecretSharingCore
 			public ref class QualifiedSubset{
 			public:
 				QualifiedSubset :: QualifiedSubset();
+				QualifiedSubset::QualifiedSubset(String^ qualifiedPath);
 				List<Trustee^>^ Parties;
 				virtual bool Equals(Object^ o) override;
 				virtual int GetHashCode() override;
-				void AssignSecretPercentage();
+				static QualifiedSubset^ Empty= gcnew QualifiedSubset();
+				virtual String^ ToString() override;
+			private:
+				String^ QualifiedSubset::aggreagate(String^ current, String^ next);
 			};
 		}
 	}

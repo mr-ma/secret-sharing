@@ -17,10 +17,8 @@ namespace SecretSharingCore
 			public:
 				int partyId;
 				List<IShare^>^ Shares;
-				double SecretSharePercentage;
-				double SeenRate;
-
 				Trustee::Trustee(int id);
+				Trustee::Trustee(String^ id);
 				int GetPartyId();
 				void Trustee::AddShare(IShare^ share);
 				virtual bool Equals(Object^ o) override;

@@ -14,80 +14,21 @@ namespace SecretSharing.ProfilerRunner
     {
         static void Main(string[] args)
         {
-            //ProfileRunner runner = new ProfileRunner();
-            //runner.Run();
-
-            //Benchmark.ShamirAntixBenchmark benchmark = new Benchmark.ShamirAntixBenchmark();
-            //var re =  benchmark.BenchmarkMeWithChunkSize();
-            //foreach (var item in re)
-            //{
-            //    Console.WriteLine(item);
-            //}
-           // benchmark.BenchmarkMeWithChunkSizeFixedParameters();
-
-            Trustee p1, p2, p3, p4, p5;
-            p1 = new Trustee(1);
-            p2 = new Trustee(2);
-            p3 = new Trustee(3);
-            p4 = new Trustee(4);
-            //p5 = new Trustee(5);
-
             // qualified subsets for minimal access structure
-           
-            //P2^P3 P1^P2^P4 P1^P3^P4
-            QualifiedSubset qs1, qs2, qs3;
-            
-            qs1 = new QualifiedSubset();
-            qs1.Parties.Add(p2);
-            qs1.Parties.Add(p3);
-
-            qs2 = new QualifiedSubset();
-            qs2.Parties.Add(p1);
-            qs2.Parties.Add(p2);
-            qs2.Parties.Add(p4);
-
-            qs3 = new QualifiedSubset();
-            qs3.Parties.Add(p1);
-            qs3.Parties.Add(p3);
-            qs3.Parties.Add(p4);
-
-            AccessStructure access = new AccessStructure();
-            access.Accesses.Add(qs1);
-            access.Accesses.Add(qs2);
-            access.Accesses.Add(qs3);
-
-            //P1^P2^P3 P1^P2^P4 P1^P3^P4
-            /*QualifiedSubset qs1, qs2, qs3;
-            qs1 = new QualifiedSubset();
-            qs1.Parties.Add(p1);
-            qs1.Parties.Add(p2);
-            qs1.Parties.Add(p3);
-            qs1.Parties.Add(p4);
-
-            qs2 = new QualifiedSubset();
-            qs2.Parties.Add(p1);
-            qs2.Parties.Add(p2);
-            qs2.Parties.Add(p4);
-            qs2.Parties.Add(p5);
-
-            qs3 = new QualifiedSubset();
-            qs3.Parties.Add(p1);
-            qs3.Parties.Add(p2);
-            qs3.Parties.Add(p3);
-            qs3.Parties.Add(p5);
-
-            AccessStructure access = new AccessStructure();
-            access.Accesses.Add(qs1);
-            access.Accesses.Add(qs2);
-            access.Accesses.Add(qs3);*/
-
-
-
-            List<Trustee> trustees = new List<Trustee>() { p1, p2, p3, p4 };
+            //P2^P3,P1^P2^P4,P1^P3^P4
+            //P1^P3^P4,P1^P2,P2^P3
+            //P1^P3^P4,P1^P2,P2^P3,P2^P4
+            //P1^P2^P3,P1^P2^P4,P1^P3^P4
+            //P1^P2,P2^P3,P3^p4,p4^p5,p5^p6,p6^p7,p7^p8,p8^p1
+            AccessStructure access = new AccessStructure("P2^P3,P1^P2^P4,P1^P3^P4");
+            List<Trustee> trustees = access.GetAllParties();
 
             //discover all possible expansion of the access structures
-            List<QualifiedSubset> subsets = ExpandAllAccessPaths(trustees).Distinct().ToList();
+            List<QualifiedSubset> subsets = ExpandAllAccessPaths( trustees).Distinct().ToList();
 
+            DumpElements(subsets);
+            Console.ReadLine();
+            //return;
 
             //we don't care about longer paths which are not mentioned in the access structure
             int longestQualifiedSubsetAccepted = GetLongestLength(access);
@@ -100,27 +41,27 @@ namespace SecretSharing.ProfilerRunner
             {
                 //delete unqualified subsets based on minimum access structure
                 if (subset.Parties.Count > longestQualifiedSubsetAccepted) continue;
-
-                var re = "";
-                foreach (var item in subset.Parties)
-                {
-                    item.SecretSharePercentage = 1.0 / subset.Parties.Count;
-                    re += (re == "" ? "" : ", ") + item.ToString();
-
-                }
                 bool isqualified = IsQualifiedSubset(subset, access);
                 if (isqualified)
                 {
                     //add the subset to expanded qualified
                     qualifiedExpandedSubset.Add(new Tuple<QualifiedSubset, int>(subset, subset.Parties.Count));
                     allsubsetsparties.AddRange(subset.Parties.Select(po => new Tuple<Trustee, int>(po, subset.Parties.Count)));
-                    Console.WriteLine("{0}.\t [{1}] q:{2}", i++, re, isqualified);
+                    Console.WriteLine("{0}.\t [{1}] q:{2}", i++, subset.ToString(), isqualified);
                 }
             }
 
             //calculate the frequency of the parties in access structures
             var partiesFrequency = allsubsetsparties.GroupBy(info=>new { info.Item1.partyId, info.Item2 }).Select(group=> new {Key = group.Key.partyId,Depth = group.Key.Item2 , Count = group.Count()});
             partiesFrequency = partiesFrequency.OrderBy(po => po.Depth);
+
+            //dump out parties frequency groupped by
+            foreach (var item in partiesFrequency)
+            {
+                Console.WriteLine("partyid:{0},depth:{1} freq:{2}", item.Key, item.Depth, item.Count);
+            }
+            
+
             ///party id , depth 
             List<Tuple<int, int>> secretkeepers = new List<Tuple<int, int>>();
             ///thresholds k,n,parties, depth
@@ -135,8 +76,12 @@ namespace SecretSharing.ProfilerRunner
                 }
                 else
                 {
-                   var thresholdcandidates = partiesFrequency.Where(po => po.Depth == item.Depth && po.Count == item.Count);
-                   if (thresholdcandidates.Count() > 0)
+                 
+                    var thresholdcandidates = partiesFrequency.Where(po => po.Depth == item.Depth && po.Count == item.Count);
+                    // To have a threshold, all combination sentences must exist means nCr(n,r) must be equal to all existing subsets in the level
+                    int allrequiredsentences = nCr(thresholdcandidates.Count(), item.Count);
+                    ///threshold found
+                    if (thresholdcandidates.Count() == allrequiredsentences)
                    {
                        //parties with same frequency and same depth are threshold candidates,
                         //where k = frequency , n = count of parties in same depth and frequency
@@ -144,6 +89,11 @@ namespace SecretSharing.ProfilerRunner
                        Console.WriteLine("threshold ({0},{1}) [{2}]", item.Count, thresholdcandidates.Count(), candidates);
                        thresholds.Add(new Tuple<int, int, string, int>(item.Count, thresholdcandidates.Count(), candidates, item.Depth));
                    }
+                        //no threshold just divide secret normally
+                    else
+                    {
+                        Console.WriteLine("no threshold respecting to party:{0} just divide secret normally",item.Key);
+                    }
                 }
             }
             var depths = partiesFrequency.Select(po => po.Depth).Distinct().ToList();
@@ -162,15 +112,11 @@ namespace SecretSharing.ProfilerRunner
                 {
                     thresholders = b.Select(po => string.Format("threshold({0},{1})[{2}]", po.Item1, po.Item2, po.Item3)).Distinct().Aggregate((current, next) => current + ", " + next);
                 }
-                Console.WriteLine("optimized path: {0} ^ {1}", secretholders, thresholders);
+                Console.WriteLine("depth:{0} optimized path: {1} ^ {2}",depth, secretholders, thresholders);
             }
             
 
-            foreach (var item in partiesFrequency)
-            {
-                Console.WriteLine("partyid:{0},depth:{1} freq:{2}", item.Key, item.Depth, item.Count);
-            }
-            
+         
             Console.ReadLine();
             //System.IO.File.WriteAllLines("benchmarkresultsNew.txt", re);
         }
@@ -198,11 +144,30 @@ namespace SecretSharing.ProfilerRunner
             {
                 QualifiedSubset ls = new QualifiedSubset();
                 ls.Parties.Add(item);
-                result.AddRange(ExpandPersonPaths(ls, persons));
+                result.AddRange(ExpandPersonPaths(ls, persons.Where(po => po.partyId != item.partyId).ToList()));
             }
             return result;
         }
 
+        static int nCr(int m, int n)
+        {
+            int tmp = 1;
+            int j = 2;
+            int k = m - n;
+            for (int i = m; i > k; i--)
+            {
+                tmp *= i;
+                while (j <= n && tmp % j == 0)
+                {
+                    tmp /= j++;
+                }
+            }
+            while (j <= n)
+            {
+                tmp /= j++;
+            }
+            return tmp;
+        }
         static List<QualifiedSubset> ExpandPersonPaths(QualifiedSubset qualifiedPersons, List<Trustee> allpersons)
         {
             //TODO: do not expand more than longest subset in the access structure
@@ -210,46 +175,25 @@ namespace SecretSharing.ProfilerRunner
             List<QualifiedSubset> result = new List<QualifiedSubset>();
             foreach (Trustee item in allpersons)
             {
-                if (qualifiedPersons.Parties.Contains(item)) continue;
+                //don't add same party twice
+               // if (qualifiedPersons.Parties.Contains(item)) continue;
                 QualifiedSubset qs = new QualifiedSubset();
                 //List<Trustee> ls = new List<Trustee>();
                 qs.Parties.AddRange(qualifiedPersons.Parties);
                 qs.Parties.Add(item);
                 result.Add(qs);
 
-                result.AddRange(ExpandPersonPaths(qs, allpersons));
+                result.AddRange(ExpandPersonPaths(qs, allpersons.Where(po=>po.partyId!=item.partyId).ToList()));
             }
             return result;
         }
 
-        /*
-              static List<List<Trustee>> ExpandAllAccessPaths(List<Trustee> persons)
+        static void DumpElements(List<QualifiedSubset> sets)
         {
-            List<List<Trustee>> result = new List<List<Trustee>>();
-            foreach (Trustee item in persons)
+            foreach (var item in sets)
             {
-                List<Trustee> ls = new List<Trustee>() { item };
-                result.AddRange(ExpandPersonPaths(ls, persons));
+                Console.WriteLine(item);
             }
-            return result;
         }
-
-        static List<List<Trustee>> ExpandPersonPaths(List<Trustee> qualifiedPersons, List<Trustee> allpersons)
-        {
-            List<List<Trustee>> result = new List<List<Trustee>>();
-            foreach (Trustee item in allpersons)
-            {
-                if (qualifiedPersons.Contains(item)) continue;
-                List<Trustee> ls = new List<Trustee>();
-                ls.AddRange(qualifiedPersons);
-                ls.Add(item);
-                result.Add(ls);
-                result.AddRange(ExpandPersonPaths(ls, allpersons));
-            }
-            return result;
-        }
-         */
-
-
     }
 }
