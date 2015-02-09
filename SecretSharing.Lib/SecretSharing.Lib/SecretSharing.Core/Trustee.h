@@ -19,6 +19,7 @@ namespace SecretSharingCore
 				List<IShare^>^ Shares;
 				Trustee::Trustee(int id);
 				Trustee::Trustee(String^ id);
+				Trustee::Trustee();
 				int GetPartyId();
 				void Trustee::AddShare(IShare^ share);
 				virtual bool Equals(Object^ o) override;

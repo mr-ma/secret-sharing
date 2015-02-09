@@ -25,6 +25,12 @@ QualifiedSubset::QualifiedSubset(String^ subset){
 		throw gcnew System::Exception("Invalid Qualified subset example of valid subset: 1^2^3");
 	}
 }
+QualifiedSubset::QualifiedSubset(IEnumerable<Trustee^>^ qualifiedPath)
+{
+	this->Parties = gcnew List<Trustee^>();
+	this->Parties->AddRange(qualifiedPath);
+}
+
 bool QualifiedSubset::Equals(Object^ obj) { // no "override" here 
 	if (obj == nullptr || GetType() != obj->GetType())
 		return false;
@@ -54,7 +60,12 @@ int QualifiedSubset::GetHashCode() { // no "override" here
 String^  QualifiedSubset::ToString(){
 	IEnumerable<String^>^ stringified = Enumerable::Select(this->Parties, gcnew Func<Trustee^, String^>(&Trustee::ToString));
 	Func<String^, String^, String^>^ func = gcnew Func < String^, String^, String^ >(this, &QualifiedSubset::aggreagate);
-	return Enumerable::Aggregate(stringified,func);
+	if (Enumerable::Count(stringified) > 0){
+		return Enumerable::Aggregate(stringified, func);
+	}
+	else{
+		return "";
+	}
 }
 
 String^ QualifiedSubset::aggreagate(String^ current, String^ next){

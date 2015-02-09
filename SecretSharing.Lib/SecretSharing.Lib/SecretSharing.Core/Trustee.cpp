@@ -10,6 +10,8 @@ using namespace SecretSharingCore::Algorithms::GeneralizedAccessStructure;
 Trustee::Trustee(int id){
 	this->partyId = id;
 }
+Trustee::Trustee(){
+}
 Trustee::Trustee(String^ id){
 	try{
 		this->partyId = Int32::Parse(id->Replace("P","")->Replace("p",""));

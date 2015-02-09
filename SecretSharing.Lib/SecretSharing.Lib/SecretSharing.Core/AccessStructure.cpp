@@ -37,6 +37,8 @@ List<Trustee^>^ AccessStructure::GetAllParties(){
 		parties->AddRange(qs->Parties);
 	}
 	
-	return System::Linq::Enumerable::ToList( System::Linq::Enumerable::Distinct(parties));
+	return System::Linq::Enumerable::ToList(
+		System::Linq::Enumerable::Distinct(parties)
+		);
 }
 

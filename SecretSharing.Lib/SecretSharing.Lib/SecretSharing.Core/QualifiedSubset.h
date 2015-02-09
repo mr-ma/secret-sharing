@@ -16,6 +16,7 @@ namespace SecretSharingCore
 			public:
 				QualifiedSubset :: QualifiedSubset();
 				QualifiedSubset::QualifiedSubset(String^ qualifiedPath);
+				QualifiedSubset::QualifiedSubset(IEnumerable<Trustee^>^ qualifiedPath);
 				List<Trustee^>^ Parties;
 				virtual bool Equals(Object^ o) override;
 				virtual int GetHashCode() override;
