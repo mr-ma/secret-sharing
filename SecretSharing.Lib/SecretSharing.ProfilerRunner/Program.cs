@@ -40,7 +40,7 @@ namespace SecretSharing.ProfilerRunner
             //calculate the share of each party in qualified subsets
             int i = 0;
             List<Tuple< Trustee,int>> allsubsetsparties = new List<Tuple< Trustee,int>>();
-            List<Tuple<QualifiedSubset, int>> qualifiedExpandedSubset = new List<Tuple<QualifiedSubset, int>>();
+            List<QualifiedSubset> qualifiedExpandedSubset = new List<QualifiedSubset>();
             foreach (QualifiedSubset subset in subsets)
             {
                 //delete unqualified subsets based on minimum access structure
@@ -49,30 +49,31 @@ namespace SecretSharing.ProfilerRunner
                 if (isqualified)
                 {
                     //add the subset to expanded qualified
-                    qualifiedExpandedSubset.Add(new Tuple<QualifiedSubset, int>(subset, subset.Parties.Count));
+                    qualifiedExpandedSubset.Add(subset);
                     allsubsetsparties.AddRange(subset.Parties.Select(po => new Tuple<Trustee, int>(po, subset.Parties.Count)));
                     Console.WriteLine("{0}.\t [{1}] q:{2}", i++, subset.ToString(), isqualified);
                 }
             }
 
-            var qualifiedSets = new List<Tuple<QualifiedSubset, List<Tuple<QualifiedSubset, int>>>>();
+            var qualifiedSets = new List<Tuple<QualifiedSubset, List<QualifiedSubset>>>();
             var binomialCoefficientList = new List<Tuple<QualifiedSubset, QualifiedSubset>>();
             foreach (var first in qualifiedExpandedSubset)
             {
                 foreach (var second in qualifiedExpandedSubset)
                 {
                     //if item is the same or depth are different skip it
-                    if (first == second || first.Item2 != second.Item2) continue;
-                    var intersect = first.Item1.Parties.Intersect(second.Item1.Parties);
-                    var nonintersect = first.Item1.Parties.Except(second.Item1.Parties).Union(second.Item1.Parties.Except(first.Item1.Parties));
+                    if (first == second || first.Parties.Count != second.Parties.Count) continue;
+                    var intersect = first.Parties.Intersect(second.Parties);
+                    var nonintersect = first.Parties.Except(second.Parties).Union(second.Parties.Except(first.Parties));
                     var intersectQS = new QualifiedSubset(intersect);
                     var nonintersectQS = new QualifiedSubset(nonintersect);
-                    var initialItems = new List<Tuple<QualifiedSubset, int>>() { first, second };
+                    var initialItems = new List<QualifiedSubset>() { first, second };
 
                     binomialCoefficientList.Add(new
                         Tuple<QualifiedSubset,
                         QualifiedSubset>(intersectQS, nonintersectQS));
-                    qualifiedSets.Add(new Tuple<QualifiedSubset, List<Tuple<QualifiedSubset, int>>>(intersectQS, new List<Tuple<QualifiedSubset, int>>() { first, second }));
+                    qualifiedSets.Add(new Tuple<QualifiedSubset, List<QualifiedSubset>>
+                        (intersectQS, new List<QualifiedSubset>() { first, second }));
                     //Console.WriteLine("Intersect:{0}, Elements:{1}", DumpElements(intersect), DumpElements(nonintersect));
                 }
             }
@@ -119,14 +120,14 @@ namespace SecretSharing.ProfilerRunner
                     var removeQSStr = "";
                     foreach (var rqs in removeQS)
                     {
-                        if (rqs[0].Item1.Parties.Count == item.Depth)
+                        if (rqs[0].Parties.Count == item.Depth)
                         {
                             //rqs.Item2.Select(po => po.Item1);
-                            removeQSStr += "[" + rqs[0].Item1.ToString() + "]";
+                            removeQSStr += "[" + rqs[0].ToString() + "]";
                         }
-                        if (rqs[1].Item1.Parties.Count == item.Depth)
+                        if (rqs[1].Parties.Count == item.Depth)
                         {
-                            removeQSStr += "[" + rqs[1].Item1.ToString() + "]";
+                            removeQSStr += "[" + rqs[1].ToString() + "]";
                         }
                     }
                     ThresholdSubset threshold = new ThresholdSubset(involvedParties.Parties.Count, item.Depth, item.Key.Parties, involvedParties.Parties);
@@ -139,96 +140,12 @@ namespace SecretSharing.ProfilerRunner
 
             foreach (ThresholdSubset th in thresholdsubsets)
             {
-                var coveredsets = th.GetQualifiedSubsets().Select(po => new Tuple<QualifiedSubset, int>(po, po.Parties.Count));
+                var coveredsets = th.GetQualifiedSubsets();
                 qualifiedExpandedSubset = qualifiedExpandedSubset.Except(coveredsets).ToList();
             }
             //thresholdsubsets + qualifiedExpandedSubset is the share;
             Console.ReadLine();
             return;
-
-
-
-
-
-            //calculate the frequency of the parties in access structures
-            var partiesFrequency = allsubsetsparties.GroupBy(info=>new { info.Item1.partyId, info.Item2 }).Select(group=> new {Key = group.Key.partyId,Depth = group.Key.Item2 , Count = group.Count()});
-            partiesFrequency = partiesFrequency.OrderBy(po => po.Depth);
-
-            //dump out parties frequency groupped by
-            foreach (var item in partiesFrequency)
-            {
-                Console.WriteLine("partyid:{0},depth:{1} freq:{2}", item.Key, item.Depth, item.Count);
-            }
-            
-
-            ///party id , depth 
-            List<Tuple<int, int>> secretkeepers = new List<Tuple<int, int>>();
-            
-            ///party id , depth 
-            List<Tuple<int, int>> noOptimisableParties = new List<Tuple<int, int>>();
-
-            ///thresholds k,n,parties, depth
-            List<Tuple<int, int, string,int>> thresholds = new List<Tuple<int, int,string,int>>();
-            foreach (var item in partiesFrequency)
-            {
-                //if party frequency is eqaual to qualified expanded subset in the depth (in all subsets) the party is a secret keeper/divider
-                if (item.Count == qualifiedExpandedSubset.Where(po=>po.Item2==item.Depth).Count())
-                {
-                    Console.WriteLine("secret keeper partyid:{0}",item.Key);
-                    secretkeepers.Add(new Tuple<int, int>(item.Key, item.Depth));
-                }
-                else
-                {
-                 
-                    var thresholdcandidates = partiesFrequency.Where(po => po.Depth == item.Depth && po.Count == item.Count);
-                    // To have a threshold, all combination sentences must exist means nCr(n,r) must be equal to all existing subsets in the level
-                    int allrequiredsentences = nCr(thresholdcandidates.Count(), item.Count);
-                    ///threshold found
-                    if (thresholdcandidates.Count() == allrequiredsentences)
-                   {
-                       //parties with same frequency and same depth are threshold candidates,
-                        //where k = frequency , n = count of parties in same depth and frequency
-                       string candidates = thresholdcandidates.Select(po => po.Key.ToString()).Aggregate((current, next) => current + ", " + next);
-                       Console.WriteLine("threshold ({0},{1}) [{2}]", item.Count, thresholdcandidates.Count(), candidates);
-                       thresholds.Add(new Tuple<int, int, string, int>(item.Count, thresholdcandidates.Count(), candidates, item.Depth));
-                   }
-                        //no threshold just divide secret normally
-                    else
-                    {
-                        noOptimisableParties.Add(new Tuple<int, int>(item.Key, item.Depth));
-                        Console.WriteLine("no threshold respecting to party:{0} just divide secret normally",item.Key);
-                    }
-                }
-            }
-            var depths = partiesFrequency.Select(po => po.Depth).Distinct().ToList();
-            foreach (var depth in depths)
-            {
-                string secretholders="";
-                string thresholders = "";
-                string nooptimisedPath = "";
-                var a = secretkeepers.Where(po => po.Item2 == depth);
-                if (a.Count() > 0)
-                {
-                    secretholders = a.Select(po => po.Item1.ToString()).Aggregate((current, next) => current + ", " + next);
-                }
-                var b = thresholds.Where(po => po.Item4 == depth);
-
-                if (b.Count() > 0)
-                {
-                    thresholders = b.Select(po => string.Format("threshold({0},{1})[{2}]", po.Item1, po.Item2, po.Item3)).Distinct().Aggregate((current, next) => current + ", " + next);
-                }
-                var c = noOptimisableParties.Where(po => po.Item2 == depth);
-                if (c.Count() > 0)
-                {
-                    nooptimisedPath = c.Select(po => po.Item1.ToString()).Aggregate((current, next) => current + ", " + next);
-                }
-                Console.WriteLine("depth:{0} optimized path: {1} ^ {2} , no optimisable{3}",depth, secretholders, thresholders,nooptimisedPath);
-            }
-            
-
-         
-            Console.ReadLine();
-            //System.IO.File.WriteAllLines("benchmarkresultsNew.txt", re);
         }
         static int GetLongestLength(AccessStructure access)
         {
