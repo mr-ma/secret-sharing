@@ -24,7 +24,7 @@ namespace SecretSharing.ProfilerRunner
             //P1^P3^P4,P1^P2,P2^P3,P2^P4
             //P1^P2^P3,P1^P2^P4,P1^P3^P4
             //P1^P2,P2^P3,P3^p4,p4^p5,p5^p6,p6^p7,p7^p8,p8^p1
-            AccessStructure access = new AccessStructure("P2^P3,P1^P2^P4,P1^P3^P4");
+            AccessStructure access = new AccessStructure("P1^P3^P4,P1^P2,P2^P3,P2^P4");
             List<Trustee> trustees = access.GetAllParties().OrderBy(po=>po.partyId).ToList();
 
             //discover all possible expansion of the access structures
@@ -55,70 +55,85 @@ namespace SecretSharing.ProfilerRunner
                 }
             }
 
-            var qualifiedSets = new List<Tuple<QualifiedSubset, List<QualifiedSubset>>>();
-            var binomialCoefficientList = new List<Tuple<QualifiedSubset, QualifiedSubset>>();
-            CalculateIntersectionsForBionomialCoefficients(qualifiedExpandedSubset, binomialCoefficientList, qualifiedSets);
 
-            //skip combinations bigger than longest qualified subset and duplications
-            var distincedBinomial = binomialCoefficientList
-                .Where(po => po.Item1.Parties.Count+po.Item2.Parties.Count <= longestQualifiedSubsetAccepted)
-                .Distinct();
-
-            foreach (var item in distincedBinomial)
-            {
-                  Console.WriteLine("Intersect:{0}, Elements:{1}", item.Item1.ToString(), item.Item2.ToString());
-            }
 
 
 
             List<ThresholdSubset> thresholdsubsets = new List<ThresholdSubset>();
-            var grouped = distincedBinomial.GroupBy(po => new { po.Item1 ,po.Item2.Parties.Count}).Select(group => new { Key = group.Key.Item1,Depth=group.Key.Count, Count = group.Count() });
-            foreach (var item in grouped)
-            {
-                //find all elements of this key
-                var elements = distincedBinomial.Where(po => po.Item1.Equals( item.Key) && po.Item2.Parties.Count == item.Depth);
-                var involvedParties = GetAllInvolvedParties(elements.Select(po=>po.Item2));
+            #region binomial stuff
+            //var qualifiedSets = new List<Tuple<QualifiedSubset, List<QualifiedSubset>>>();
+            //var binomialCoefficientList = new List<Tuple<QualifiedSubset, QualifiedSubset>>();
+            //CalculateIntersectionsForBionomialCoefficients(qualifiedExpandedSubset, binomialCoefficientList, qualifiedSets);
 
-                /// we are not interested in threshold of the m,m
-                if (involvedParties.Parties.Count== item.Depth){
-                    Console.WriteLine("Fixed:{0}[{1}]", item.Key, involvedParties);
+            ////skip combinations bigger than longest qualified subset and duplications
+            //var distincedBinomial = binomialCoefficientList
+            //    .Where(po => po.Item1.Parties.Count+po.Item2.Parties.Count <= longestQualifiedSubsetAccepted)
+            //    .Distinct();
+
+            //foreach (var item in distincedBinomial)
+            //{
+            //      Console.WriteLine("Intersect:{0}, Elements:{1}", item.Item1.ToString(), item.Item2.ToString());
+            //}
+            //var grouped = distincedBinomial.GroupBy(po => new { po.Item1 ,po.Item2.Parties.Count}).Select(group => new { Key = group.Key.Item1,Depth=group.Key.Count, Count = group.Count() });
+            //foreach (var item in grouped)
+            //{
+            //    //find all elements of this key
+            //    var elements = distincedBinomial.Where(po => po.Item1.Equals( item.Key) && po.Item2.Parties.Count == item.Depth);
+            //    var involvedParties = GetAllInvolvedParties(elements.Select(po=>po.Item2));
+
+            //    /// we are not interested in threshold of the m,m
+            //    if (involvedParties.Parties.Count== item.Depth){
+            //        Console.WriteLine("Fixed:{0}[{1}]", item.Key, involvedParties);
                
-                }
-                else if( item.Count == nCr(involvedParties.Parties.Count, item.Depth))
-                {
-                    var removeQS = qualifiedSets.Where(po => po.Item1.Equals(item.Key)).Select(po => po.Item2);
-                    var removeQSStr = "";
-                    foreach (var rqs in removeQS)
-                    {
-                        if (rqs[0].Parties.Count == item.Depth)
-                        {
-                            //rqs.Item2.Select(po => po.Item1);
-                            removeQSStr += "[" + rqs[0].ToString() + "]";
-                        }
-                        if (rqs[1].Parties.Count == item.Depth)
-                        {
-                            removeQSStr += "[" + rqs[1].ToString() + "]";
-                        }
-                    }
-                    ThresholdSubset threshold = new ThresholdSubset(involvedParties.Parties.Count, item.Depth, item.Key.Parties, involvedParties.Parties);
-                    thresholdsubsets.Add(threshold);
-                    Console.WriteLine("Fixed:{0} Threshold:({1},{2})[{3}]", item.Key, item.Depth, involvedParties.Parties.Count, involvedParties);
-                }
-                //Console.WriteLine("Grouped:{0} depth:{1} Count:{2}",item.Key,item.Depth,item.Count);
-            }
+            //    }
+            //    else if( item.Count == nCr(involvedParties.Parties.Count, item.Depth))
+            //    {
+            //        var removeQS = qualifiedSets.Where(po => po.Item1.Equals(item.Key)).Select(po => po.Item2);
+            //        var removeQSStr = "";
+            //        foreach (var rqs in removeQS)
+            //        {
+            //            if (rqs[0].Parties.Count == item.Depth)
+            //            {
+            //                //rqs.Item2.Select(po => po.Item1);
+            //                removeQSStr += "[" + rqs[0].ToString() + "]";
+            //            }
+            //            if (rqs[1].Parties.Count == item.Depth)
+            //            {
+            //                removeQSStr += "[" + rqs[1].ToString() + "]";
+            //            }
+            //        }
+            //        ThresholdSubset threshold = new ThresholdSubset(involvedParties.Parties.Count, item.Depth, item.Key.Parties, involvedParties.Parties);
+            //        thresholdsubsets.Add(threshold);
+            //        Console.WriteLine("Fixed:{0} Threshold:({1},{2})[{3}]", item.Key, item.Depth, involvedParties.Parties.Count, involvedParties);
+            //    }
+            //    //Console.WriteLine("Grouped:{0} depth:{1} Count:{2}",item.Key,item.Depth,item.Count);
+            //}
+            #endregion
 
             var normalTH = qualifiedExpandedSubset.GroupBy(po => po.Parties.Count).Select(info => new {Depth = info.Key,Count= info.Count()});
             foreach (var th in normalTH)
             {
-               var candidateSets= qualifiedExpandedSubset.Where(po => po.Parties.Count == th.Depth);
-               ///find threshol in sets
+               var candidateSets = qualifiedExpandedSubset.Where(po => po.Parties.Count == th.Depth);
+               
+                ///find threshold in sets
                var threshold = findThreshold(candidateSets,th.Depth,trustees.Count);
-               if (threshold.Count != 0) thresholdsubsets.AddRange(threshold);
+               if (threshold.Count == 0) 
+               {  
+                   //maybe it has a fixed item let's try with fix detector
+                   threshold = findFixedConcatThreshold(candidateSets, th.Depth, trustees.Count); 
+               }
+
+               if (threshold.Count != 0) 
+               { 
+                   thresholdsubsets.AddRange(threshold);
+               }
+               
             }
 
 
             foreach (ThresholdSubset th in thresholdsubsets)
             {
+                Console.WriteLine(th);
                 var coveredsets =ThresholdHelper.ExploreAllSubsets( th);
                 Console.WriteLine("covered sets:");
                 DumpElements(coveredsets);
@@ -150,10 +165,34 @@ namespace SecretSharing.ProfilerRunner
                     });
         }
 
+        static List<ThresholdSubset> findFixedConcatThreshold(IEnumerable<QualifiedSubset> candidateSets, int depth, int allparties)
+        {
+            //fixed element normal case : just a fixed element in front of threshold candidates
+            var fixedIntersection = candidateSets.Select(po => po.Parties).Aggregate((first, second) => first.Intersect(second).ToList());
+
+            if (fixedIntersection.Count > 0)
+            {
+                var smallerQS = new List<QualifiedSubset>();
+                //remove fixed part from parties and try to find normal threshold
+                foreach (var qs in candidateSets)
+                {
+                     smallerQS.Add(new QualifiedSubset( qs.Parties.Except(fixedIntersection)));
+                }
+                var threshold = findThreshold(smallerQS, depth - fixedIntersection.Count, GetAllInvolvedParties(smallerQS).Parties.Count);
+
+                //now add the fixed part to the threshold
+                foreach (var th in threshold)
+                {
+                    th.fixedParties = fixedIntersection;
+                }
+                return threshold;
+            }
+            return null;
+        }
+
         private static List<ThresholdSubset> findThreshold(IEnumerable<QualifiedSubset> candidateSets,int depth,int allparties)
         {
-            
-
+            // normal case
             List<ThresholdSubset> thresholds = new List<ThresholdSubset>();
 
             if(nCr(allparties,depth) ==candidateSets.Count() ) {

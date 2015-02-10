@@ -11,7 +11,18 @@ namespace SecretSharing.ProfilerRunner
     {
         public static IEnumerable<QualifiedSubset> ExploreAllSubsets(ThresholdSubset threshold)
         {
-            return threshold.thresholdParties.Combinations(threshold.K).Select(po=> new QualifiedSubset(po));
+            var comb = threshold.thresholdParties.Combinations(threshold.K).Select(po=> new QualifiedSubset(po));
+            if (threshold.fixedParties != null && threshold.fixedParties.Count() > 0)
+            {
+                List<QualifiedSubset> largerQS = new List<QualifiedSubset>();
+                foreach (var qs in comb)
+                {
+                    QualifiedSubset lqs = new QualifiedSubset(threshold.fixedParties.Union(qs.Parties));
+                    largerQS.Add(lqs);
+                }
+                return largerQS;
+            }
+            return comb;
         }
 
         public static IEnumerable<IEnumerable<T>> Combinations<T>(this IEnumerable<T> elements, int k)

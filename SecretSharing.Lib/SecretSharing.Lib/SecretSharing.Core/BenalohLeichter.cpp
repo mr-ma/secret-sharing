@@ -76,7 +76,7 @@ List<IShare^>^ BenalohLeichter::DivideSecret(array<Byte>^  secret, AccessStructu
 		sum += r;
 		cout << "last sum: " << sum << '\n';
 		cout << "secret" << SecretZZ<<'\n';
-		if (sum != SecretZZ) throw gcnew System::Exception("benaloh failed");
+		if (sum != SecretZZ) throw gcnew System::Exception("Failed to divide secret");
 
 		ZZ* primePtr = new ZZ(p);
 		ZZ_p *yz = new ZZ_p(to_ZZ_p(r));
