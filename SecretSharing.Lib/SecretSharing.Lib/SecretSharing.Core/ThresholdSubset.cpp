@@ -95,4 +95,3 @@ IEnumerable<Trustee^>^ ThresholdSubset::swap(IEnumerable<Trustee^>^ s, int i, in
 	return tr;
 }
 
-

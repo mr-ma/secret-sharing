@@ -10,7 +10,7 @@ using System.Threading.Tasks;
 
 namespace SecretSharing.ProfilerRunner
 {
-    class Program
+    static class Program
     {
         static void Main(string[] args)
         {
@@ -24,7 +24,7 @@ namespace SecretSharing.ProfilerRunner
             //P1^P3^P4,P1^P2,P2^P3,P2^P4
             //P1^P2^P3,P1^P2^P4,P1^P3^P4
             //P1^P2,P2^P3,P3^p4,p4^p5,p5^p6,p6^p7,p7^p8,p8^p1
-            AccessStructure access = new AccessStructure("P1,P2^P3,P1^P2^P4,P1^P3^P4");
+            AccessStructure access = new AccessStructure("P2^P3,P1^P2^P4,P1^P3^P4");
             List<Trustee> trustees = access.GetAllParties().OrderBy(po=>po.partyId).ToList();
 
             //discover all possible expansion of the access structures
@@ -57,26 +57,7 @@ namespace SecretSharing.ProfilerRunner
 
             var qualifiedSets = new List<Tuple<QualifiedSubset, List<QualifiedSubset>>>();
             var binomialCoefficientList = new List<Tuple<QualifiedSubset, QualifiedSubset>>();
-            foreach (var first in qualifiedExpandedSubset)
-            {
-                foreach (var second in qualifiedExpandedSubset)
-                {
-                    //if item is the same or depth are different skip it
-                    if (first == second || first.Parties.Count != second.Parties.Count) continue;
-                    var intersect = first.Parties.Intersect(second.Parties);
-                    var nonintersect = first.Parties.Except(second.Parties).Union(second.Parties.Except(first.Parties));
-                    var intersectQS = new QualifiedSubset(intersect);
-                    var nonintersectQS = new QualifiedSubset(nonintersect);
-                    var initialItems = new List<QualifiedSubset>() { first, second };
-
-                    binomialCoefficientList.Add(new
-                        Tuple<QualifiedSubset,
-                        QualifiedSubset>(intersectQS, nonintersectQS));
-                    qualifiedSets.Add(new Tuple<QualifiedSubset, List<QualifiedSubset>>
-                        (intersectQS, new List<QualifiedSubset>() { first, second }));
-                    //Console.WriteLine("Intersect:{0}, Elements:{1}", DumpElements(intersect), DumpElements(nonintersect));
-                }
-            }
+            CalculateIntersectionsForBionomialCoefficients(qualifiedExpandedSubset, binomialCoefficientList, qualifiedSets);
 
             //skip combinations bigger than longest qualified subset and duplications
             var distincedBinomial = binomialCoefficientList
@@ -96,18 +77,7 @@ namespace SecretSharing.ProfilerRunner
             {
                 //find all elements of this key
                 var elements = distincedBinomial.Where(po => po.Item1.Equals( item.Key) && po.Item2.Parties.Count == item.Depth);
-                var involvedParties = elements.Select(po => po.Item2).Distinct().Aggregate(
-                    (current, next) =>
-                {
-                    foreach (var inparty in next.Parties)
-                    {
-                        if (!current.Parties.Contains(inparty))
-                        {
-                            current.Parties.Add(inparty);
-                        }
-                    }
-                    return current;
-                });
+                var involvedParties = GetAllInvolvedParties(elements.Select(po=>po.Item2));
 
                 /// we are not interested in threshold of the m,m
                 if (involvedParties.Parties.Count== item.Depth){
@@ -137,15 +107,96 @@ namespace SecretSharing.ProfilerRunner
                 //Console.WriteLine("Grouped:{0} depth:{1} Count:{2}",item.Key,item.Depth,item.Count);
             }
 
+            var normalTH = qualifiedExpandedSubset.GroupBy(po => po.Parties.Count).Select(info => new {Depth = info.Key,Count= info.Count()});
+            foreach (var th in normalTH)
+            {
+               var candidateSets= qualifiedExpandedSubset.Where(po => po.Parties.Count == th.Depth);
+               ///find threshol in sets
+               var threshold = findThreshold(candidateSets,th.Depth,trustees.Count);
+               if (threshold.Count != 0) thresholdsubsets.AddRange(threshold);
+            }
+
 
             foreach (ThresholdSubset th in thresholdsubsets)
             {
-                var coveredsets = th.GetQualifiedSubsets();
+                var coveredsets =ThresholdHelper.ExploreAllSubsets( th);
+                Console.WriteLine("covered sets:");
+                DumpElements(coveredsets);
+
                 qualifiedExpandedSubset = qualifiedExpandedSubset.Except(coveredsets).ToList();
             }
+
+            Console.WriteLine("All remaining subsets");
+            DumpElements(qualifiedExpandedSubset);
+
             //thresholdsubsets + qualifiedExpandedSubset is the share;
             Console.ReadLine();
             return;
+        }
+
+        private static QualifiedSubset GetAllInvolvedParties(IEnumerable<QualifiedSubset> elements)
+        {
+           return  elements.Distinct().Aggregate(
+                    (current, next) =>
+                    {
+                        foreach (var inparty in next.Parties)
+                        {
+                            if (!current.Parties.Contains(inparty))
+                            {
+                                current.Parties.Add(inparty);
+                            }
+                        }
+                        return current;
+                    });
+        }
+
+        private static List<ThresholdSubset> findThreshold(IEnumerable<QualifiedSubset> candidateSets,int depth,int allparties)
+        {
+            
+
+            List<ThresholdSubset> thresholds = new List<ThresholdSubset>();
+
+            if(nCr(allparties,depth) ==candidateSets.Count() ) {
+                ThresholdSubset th = new ThresholdSubset(allparties,depth,new List<Trustee>(),GetAllInvolvedParties(candidateSets).Parties );
+                thresholds.Add(th);
+            }
+            return thresholds;
+            
+            //List<Tuple<int, int>> partyFrequencies = new List<Tuple<int, int>>();
+            //foreach (QualifiedSubset qs in candidateSets)
+            //{
+            //   partyFrequencies.AddRange(  qs.Parties.GroupBy(po => po.partyId).Select(group => new Tuple<int,int>(group.Key,group.Count() )));
+            //}
+
+
+               ///if cnr(allparties,depth) == all subsets in the length full threshold
+        }
+
+
+        static void CalculateIntersectionsForBionomialCoefficients(IEnumerable<QualifiedSubset> qualifiedExpandedSubset, 
+            List< Tuple<QualifiedSubset,
+                        QualifiedSubset>> binomialCoefficientList ,List<Tuple<QualifiedSubset, List<QualifiedSubset>>> qualifiedSets )
+        {
+            foreach (var first in qualifiedExpandedSubset)
+            {
+                foreach (var second in qualifiedExpandedSubset)
+                {
+                    //if item is the same or depth are different skip it
+                    if (first == second || first.Parties.Count != second.Parties.Count) continue;
+                    var intersect = first.Parties.Intersect(second.Parties);
+                    var nonintersect = first.Parties.Except(second.Parties).Union(second.Parties.Except(first.Parties));
+                    var intersectQS = new QualifiedSubset(intersect);
+                    var nonintersectQS = new QualifiedSubset(nonintersect);
+                    var initialItems = new List<QualifiedSubset>() { first, second };
+
+                    binomialCoefficientList.Add(new
+                        Tuple<QualifiedSubset,
+                        QualifiedSubset>(intersectQS, nonintersectQS));
+                    qualifiedSets.Add(new Tuple<QualifiedSubset, List<QualifiedSubset>>
+                        (intersectQS, new List<QualifiedSubset>() { first, second }));
+                    //Console.WriteLine("Intersect:{0}, Elements:{1}", DumpElements(intersect), DumpElements(nonintersect));
+                }
+            }
         }
         static int GetLongestLength(AccessStructure access)
         {
@@ -217,7 +268,7 @@ namespace SecretSharing.ProfilerRunner
             return result;
         }
 
-        static void DumpElements(List<QualifiedSubset> sets)
+        static void DumpElements(IEnumerable<QualifiedSubset> sets)
         {
             foreach (var item in sets)
             {
@@ -272,6 +323,6 @@ namespace SecretSharing.ProfilerRunner
             Console.WriteLine(array);
         }
 
-        
+      
     }
 }
