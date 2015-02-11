@@ -123,7 +123,7 @@ namespace SecretSharing.ProfilerRunner
                    threshold = findFixedConcatThreshold(candidateSets, th.Depth, trustees.Count); 
                }
 
-               if (threshold.Count != 0) 
+               if ( threshold!=null && threshold.Count != 0) 
                { 
                    thresholdsubsets.AddRange(threshold);
                }
@@ -151,18 +151,19 @@ namespace SecretSharing.ProfilerRunner
 
         private static QualifiedSubset GetAllInvolvedParties(IEnumerable<QualifiedSubset> elements)
         {
-           return  elements.Distinct().Aggregate(
-                    (current, next) =>
+            var sum = new QualifiedSubset();
+            foreach (var qs in elements)
+            {
+                foreach (var party in qs.Parties)
+                {
+                    if (!sum.Parties.Contains(party))
                     {
-                        foreach (var inparty in next.Parties)
-                        {
-                            if (!current.Parties.Contains(inparty))
-                            {
-                                current.Parties.Add(inparty);
-                            }
-                        }
-                        return current;
-                    });
+                        sum.Parties.Add(party);
+                    }
+                }
+            }
+
+            return sum;
         }
 
         static List<ThresholdSubset> findFixedConcatThreshold(IEnumerable<QualifiedSubset> candidateSets, int depth, int allparties)
@@ -176,7 +177,8 @@ namespace SecretSharing.ProfilerRunner
                 //remove fixed part from parties and try to find normal threshold
                 foreach (var qs in candidateSets)
                 {
-                     smallerQS.Add(new QualifiedSubset( qs.Parties.Except(fixedIntersection)));
+                    var tempqs = new QualifiedSubset( qs.Parties.Except(fixedIntersection));
+                    smallerQS.Add(tempqs);
                 }
                 var threshold = findThreshold(smallerQS, depth - fixedIntersection.Count, GetAllInvolvedParties(smallerQS).Parties.Count);
 
@@ -194,11 +196,23 @@ namespace SecretSharing.ProfilerRunner
         {
             // normal case
             List<ThresholdSubset> thresholds = new List<ThresholdSubset>();
+            var ncr = nCr(allparties,depth);
 
-            if(nCr(allparties,depth) ==candidateSets.Count() ) {
-                ThresholdSubset th = new ThresholdSubset(allparties,depth,new List<Trustee>(),GetAllInvolvedParties(candidateSets).Parties );
-                thresholds.Add(th);
+            if( ncr == candidateSets.Count() ) {
+                //TODO: check frequencies too
+                bool allHaveEqualFrequency = IsAllPartiesFrequencyEqual(candidateSets);
+                if (allHaveEqualFrequency)
+                {
+                    ThresholdSubset th = new ThresholdSubset(allparties, depth, new List<Trustee>(), GetAllInvolvedParties(candidateSets).Parties);
+                    thresholds.Add(th);
+                }
             }
+            else if (candidateSets.Count() > ncr)
+            {
+                //all possible candidate sets must be generated and recursively called
+
+            }
+
             return thresholds;
             
             //List<Tuple<int, int>> partyFrequencies = new List<Tuple<int, int>>();
@@ -211,7 +225,19 @@ namespace SecretSharing.ProfilerRunner
                ///if cnr(allparties,depth) == all subsets in the length full threshold
         }
 
+        static bool IsAllPartiesFrequencyEqual(IEnumerable<QualifiedSubset> candidateSets)
+        {
+            var frequencie = new List<Tuple<int, int>>();
+            foreach (QualifiedSubset qs in candidateSets)
+            {
+                frequencie.AddRange(qs.Parties.GroupBy(po => po.partyId).Select(grp => new Tuple<int, int>(grp.Key, grp.Count())));
+            }
 
+            var itemsFrequencies = frequencie.GroupBy(po => po.Item1).Select(group => new Tuple<int, int>(group.Key, group.Sum(grp => grp.Item2)));
+            var firstItem = itemsFrequencies.First();
+            bool allHaveEqualFrequency = itemsFrequencies.All(s => s.Item2 == firstItem.Item2);
+            return allHaveEqualFrequency;
+        }
         static void CalculateIntersectionsForBionomialCoefficients(IEnumerable<QualifiedSubset> qualifiedExpandedSubset, 
             List< Tuple<QualifiedSubset,
                         QualifiedSubset>> binomialCoefficientList ,List<Tuple<QualifiedSubset, List<QualifiedSubset>>> qualifiedSets )
