@@ -30,6 +30,7 @@ bool ThresholdSubset::Equals(Object^ obj) {
 				return false;
 		}
 	}
+	else return false;
 	if (Enumerable::Count(this->thresholdParties) == Enumerable::Count(p->thresholdParties)){
 
 		for each (Trustee^ var in p->thresholdParties)
@@ -38,6 +39,7 @@ bool ThresholdSubset::Equals(Object^ obj) {
 				return false;
 		}
 	}
+	else return false;
 	return true;
 }
 int ThresholdSubset::GetHashCode() { 

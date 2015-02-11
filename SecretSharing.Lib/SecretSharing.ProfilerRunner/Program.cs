@@ -23,13 +23,15 @@ namespace SecretSharing.ProfilerRunner
             //P1^P3^P4,P1^P2,P2^P3
             //P1^P3^P4,P1^P2,P2^P3,P2^P4
             //P1^P2^P3,P1^P2^P4,P1^P3^P4
-            //P1^P2,P2^P3,P3^p4,p4^p5,p5^p6,p6^p7,p7^p8,p8^p1
-            AccessStructure access = new AccessStructure("P1^P3^P4,P1^P2,P2^P3,P2^P4");
+            //no threshold: P1^P2,P2^P3,P3^p4,p4^p5,p5^p6,p6^p7,p7^p8,p8^p1
+            //threshold ruiner: p1^p2^p3,p2^p3^p4,p1^p3^p4,p1^p2^p4,p4^p5^p6,p4^p5^p7,p4^p6^p7
+
+            AccessStructure access = new AccessStructure("p1^p2^p3,p2^p3^p4,p1^p3^p4,p1^p2^p4,p4^p5^p6,p4^p5^p7,p4^p6^p7");
             List<Trustee> trustees = access.GetAllParties().OrderBy(po=>po.partyId).ToList();
 
             //discover all possible expansion of the access structures
             List<QualifiedSubset> subsets = ExpandPersonPaths(null, trustees).Distinct().ToList();
-
+            Console.WriteLine("All expanded subsets:");
             DumpElements(subsets);
            
             //return;
@@ -41,6 +43,7 @@ namespace SecretSharing.ProfilerRunner
             int i = 0;
             List<Tuple< Trustee,int>> allsubsetsparties = new List<Tuple< Trustee,int>>();
             List<QualifiedSubset> qualifiedExpandedSubset = new List<QualifiedSubset>();
+            Console.WriteLine("All qualified expanded subsets:");
             foreach (QualifiedSubset subset in subsets)
             {
                 //delete unqualified subsets based on minimum access structure
@@ -60,56 +63,6 @@ namespace SecretSharing.ProfilerRunner
 
 
             List<ThresholdSubset> thresholdsubsets = new List<ThresholdSubset>();
-            #region binomial stuff
-            //var qualifiedSets = new List<Tuple<QualifiedSubset, List<QualifiedSubset>>>();
-            //var binomialCoefficientList = new List<Tuple<QualifiedSubset, QualifiedSubset>>();
-            //CalculateIntersectionsForBionomialCoefficients(qualifiedExpandedSubset, binomialCoefficientList, qualifiedSets);
-
-            ////skip combinations bigger than longest qualified subset and duplications
-            //var distincedBinomial = binomialCoefficientList
-            //    .Where(po => po.Item1.Parties.Count+po.Item2.Parties.Count <= longestQualifiedSubsetAccepted)
-            //    .Distinct();
-
-            //foreach (var item in distincedBinomial)
-            //{
-            //      Console.WriteLine("Intersect:{0}, Elements:{1}", item.Item1.ToString(), item.Item2.ToString());
-            //}
-            //var grouped = distincedBinomial.GroupBy(po => new { po.Item1 ,po.Item2.Parties.Count}).Select(group => new { Key = group.Key.Item1,Depth=group.Key.Count, Count = group.Count() });
-            //foreach (var item in grouped)
-            //{
-            //    //find all elements of this key
-            //    var elements = distincedBinomial.Where(po => po.Item1.Equals( item.Key) && po.Item2.Parties.Count == item.Depth);
-            //    var involvedParties = GetAllInvolvedParties(elements.Select(po=>po.Item2));
-
-            //    /// we are not interested in threshold of the m,m
-            //    if (involvedParties.Parties.Count== item.Depth){
-            //        Console.WriteLine("Fixed:{0}[{1}]", item.Key, involvedParties);
-               
-            //    }
-            //    else if( item.Count == nCr(involvedParties.Parties.Count, item.Depth))
-            //    {
-            //        var removeQS = qualifiedSets.Where(po => po.Item1.Equals(item.Key)).Select(po => po.Item2);
-            //        var removeQSStr = "";
-            //        foreach (var rqs in removeQS)
-            //        {
-            //            if (rqs[0].Parties.Count == item.Depth)
-            //            {
-            //                //rqs.Item2.Select(po => po.Item1);
-            //                removeQSStr += "[" + rqs[0].ToString() + "]";
-            //            }
-            //            if (rqs[1].Parties.Count == item.Depth)
-            //            {
-            //                removeQSStr += "[" + rqs[1].ToString() + "]";
-            //            }
-            //        }
-            //        ThresholdSubset threshold = new ThresholdSubset(involvedParties.Parties.Count, item.Depth, item.Key.Parties, involvedParties.Parties);
-            //        thresholdsubsets.Add(threshold);
-            //        Console.WriteLine("Fixed:{0} Threshold:({1},{2})[{3}]", item.Key, item.Depth, involvedParties.Parties.Count, involvedParties);
-            //    }
-            //    //Console.WriteLine("Grouped:{0} depth:{1} Count:{2}",item.Key,item.Depth,item.Count);
-            //}
-            #endregion
-
             var normalTH = qualifiedExpandedSubset.GroupBy(po => po.Parties.Count).Select(info => new {Depth = info.Key,Count= info.Count()});
             foreach (var th in normalTH)
             {
@@ -119,7 +72,7 @@ namespace SecretSharing.ProfilerRunner
                var threshold = findThreshold(candidateSets,th.Depth,trustees.Count);
                if (threshold.Count == 0) 
                {  
-                   //maybe it has a fixed item let's try with fix detector
+                   //maybe it has a fixed item let's try with fixed item threshold detector
                    threshold = findFixedConcatThreshold(candidateSets, th.Depth, trustees.Count); 
                }
 
@@ -130,23 +83,44 @@ namespace SecretSharing.ProfilerRunner
                
             }
 
-
-            foreach (ThresholdSubset th in thresholdsubsets)
+            Console.WriteLine("All detected optimal thresholds:");
+            foreach (ThresholdSubset th in CheckInclusiveThresholds(thresholdsubsets.Distinct()))
             {
                 Console.WriteLine(th);
                 var coveredsets =ThresholdHelper.ExploreAllSubsets( th);
-                Console.WriteLine("covered sets:");
-                DumpElements(coveredsets);
+               // Console.WriteLine("covered sets:");
+                //DumpElements(coveredsets);
 
                 qualifiedExpandedSubset = qualifiedExpandedSubset.Except(coveredsets).ToList();
             }
 
-            Console.WriteLine("All remaining subsets");
+            Console.WriteLine("All remaining subsets:");
             DumpElements(qualifiedExpandedSubset);
 
             //thresholdsubsets + qualifiedExpandedSubset is the share;
             Console.ReadLine();
             return;
+        }
+
+        private static IEnumerable<ThresholdSubset> CheckInclusiveThresholds(IEnumerable<ThresholdSubset> thresholds)
+        {
+            List<ThresholdSubset> alreadyIncludedThresholds = new List<ThresholdSubset>();
+            foreach (var th in thresholds)
+            {
+                var allSubsets = ThresholdHelper.ExploreAllSubsets(th);
+                foreach (var sth in thresholds)
+                {
+                    if (th.Equals(sth)) 
+                        continue;
+                    var sallsubs = ThresholdHelper.ExploreAllSubsets(sth);
+                    var inclusivethreshold = !sallsubs.Except(allSubsets).Any();
+                    if (inclusivethreshold)
+                    {
+                        alreadyIncludedThresholds.Add(sth);
+                    }
+                }
+            }  
+            return thresholds.Except(alreadyIncludedThresholds).ToList();
         }
 
         private static QualifiedSubset GetAllInvolvedParties(IEnumerable<QualifiedSubset> elements)
@@ -194,11 +168,12 @@ namespace SecretSharing.ProfilerRunner
 
         private static List<ThresholdSubset> findThreshold(IEnumerable<QualifiedSubset> candidateSets,int depth,int allparties)
         {
+            int allsentences = candidateSets.Count();
             // normal case
             List<ThresholdSubset> thresholds = new List<ThresholdSubset>();
             var ncr = nCr(allparties,depth);
 
-            if( ncr == candidateSets.Count() ) {
+            if( ncr ==  allsentences) {
                 //TODO: check frequencies too
                 bool allHaveEqualFrequency = IsAllPartiesFrequencyEqual(candidateSets);
                 if (allHaveEqualFrequency)
@@ -207,24 +182,49 @@ namespace SecretSharing.ProfilerRunner
                     thresholds.Add(th);
                 }
             }
-            else if (candidateSets.Count() > ncr)
+                /// if the candidate set is larger than nCr then probably some sets don't belong to the threshold 
+                /// Here we recusrively rotate parties and select all possible combinations to see which ones are 
+                /// building threshold for e.g. p1p2p3 p2p3p4 p1p3p4 p1p2p4 p2p4p5 
+            else if (allsentences < ncr)
             {
                 //all possible candidate sets must be generated and recursively called
+                if (allsentences > 2)
+                {
+                    var nextPossibleCombination = GetNextPossibleCombiantion(allparties, depth, allsentences);
+                    if (nextPossibleCombination == 1) return null;
+                    var smallersetcombinations = candidateSets.Combinations(nextPossibleCombination);
+                    foreach (var smallerset in smallersetcombinations)
+                    {
+                        if (smallerset != null)
+                        {
+                            var newallparties = GetAllInvolvedParties(smallerset).Parties.Count;
+                            var foundthresholds = findThreshold(smallerset, depth, newallparties);
+                            ///try filtering the fixed sets maybe find a threshold 
+                            if (foundthresholds == null || foundthresholds.Count == 0)
+                            {
+                                foundthresholds = findFixedConcatThreshold(smallerset, depth, newallparties);
+                            }
+                            if (foundthresholds != null && foundthresholds.Count > 0)
+                            {
+                                thresholds.AddRange(foundthresholds);
+                            }
+                        }
+                    }
 
+                }
             }
 
             return thresholds;
-            
-            //List<Tuple<int, int>> partyFrequencies = new List<Tuple<int, int>>();
-            //foreach (QualifiedSubset qs in candidateSets)
-            //{
-            //   partyFrequencies.AddRange(  qs.Parties.GroupBy(po => po.partyId).Select(group => new Tuple<int,int>(group.Key,group.Count() )));
-            //}
-
-
-               ///if cnr(allparties,depth) == all subsets in the length full threshold
         }
+        static int GetNextPossibleCombiantion(int allParties, int depth,int allsentences)
+        {
 
+            var a = nCr(allParties,depth);
+            while(a>= allsentences)
+                a = nCr(--allParties, depth);
+
+            return a;
+        }
         static bool IsAllPartiesFrequencyEqual(IEnumerable<QualifiedSubset> candidateSets)
         {
             var frequencie = new List<Tuple<int, int>>();
