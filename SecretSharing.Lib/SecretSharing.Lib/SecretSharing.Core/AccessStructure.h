@@ -13,12 +13,17 @@ namespace SecretSharingCore
 	namespace Algorithms
 	{
 		namespace GeneralizedAccessStructure{
+
 			public ref class AccessStructure{
+				private:
+					int AccessStructure::getMax(QualifiedSubset^ qs);
 			public:
 				AccessStructure::AccessStructure();
 				AccessStructure::AccessStructure(String^ minimalAccessPath);
 				List<QualifiedSubset^>^  Accesses;
 				List<Trustee^>^ AccessStructure::GetAllParties();
+				int AccessStructure::GetLongestLength();
+				
 			};
 		}
 	}

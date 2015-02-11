@@ -42,3 +42,13 @@ List<Trustee^>^ AccessStructure::GetAllParties(){
 		);
 }
 
+int AccessStructure::GetLongestLength(){
+	return Enumerable::Max(this->Accesses, gcnew Func<QualifiedSubset^, int>(this, &AccessStructure::getMax));
+}
+
+
+int AccessStructure::getMax(QualifiedSubset^ qs){
+	return qs->Parties->Count;
+}
+
+
