@@ -1,5 +1,5 @@
 ﻿using SecretSharing.ProfilerRunner;
-using SecretSharingCore.Algorithms.GeneralizedAccessStructure;
+using SecretSharing.ProfilerRunner.Models;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -22,19 +22,27 @@ namespace GameOfThresholds.Controllers
 
         public ActionResult DetectThreshold(string access)
         {
-            AccessStructure acc = new AccessStructure(access);
-            var expanded = new  List<QualifiedSubset>();
-            var qualified = new  List<QualifiedSubset>();
-            var thresholds = new List<ThresholdSubset>();
-            var remaining = new List<QualifiedSubset>();
+            var start = DateTime.Now;
+            if (!string.IsNullOrEmpty(access))
+            {
 
-            Program.ServeThresholdDetection(acc, out expanded,out  qualified,out  thresholds,out remaining);
 
-            ViewBag.expanded = expanded;
-            ViewBag.qualified = qualified;
-            ViewBag.thresholds = thresholds;
-            ViewBag.remaining = remaining;
+                AccessStructure acc = new AccessStructure(access);
+                var expanded = new List<QualifiedSubset>();
+                var qualified = new List<QualifiedSubset>();
+                var thresholds = new List<ThresholdSubset>();
+                var remaining = new List<QualifiedSubset>();
+                var attempts = new List<String>();
+                ThresholdHelper.ServeThresholdDetection(acc, out expanded, out  qualified, out  thresholds, out attempts, out remaining);
 
+                ViewBag.expanded = expanded;
+                ViewBag.qualified = qualified;
+                ViewBag.thresholds = thresholds;
+                ViewBag.remaining = remaining;
+                ViewBag.attempts = attempts;
+
+            }
+            ViewBag.elapsedSeconds = (DateTime.Now - start).TotalSeconds;
             return View();
         }
 

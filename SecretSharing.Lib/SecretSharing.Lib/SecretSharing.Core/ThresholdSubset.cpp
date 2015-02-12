@@ -59,7 +59,13 @@ String^  ThresholdSubset::ToString(){
 
 	QualifiedSubset^ qss = gcnew QualifiedSubset();
 	qss->Parties->AddRange(this->fixedParties);
-	return String::Format("{0} ^ Threshold({1},{2})[{3}]",qss->ToString(), K, N, qs->ToString());
+	if (!String::IsNullOrEmpty(qss->ToString()))
+	{
+		return String::Format("{0} ^ Threshold({1},{2})[{3}]", qss->ToString(), K, N, qs->ToString());
+	}
+	else{
+		return String::Format("Threshold({0},{1})[{2}]",  K, N, qs->ToString());
+	}
 }
 
 IEnumerable<QualifiedSubset^>^ ThresholdSubset::GetQualifiedSubsets(){
