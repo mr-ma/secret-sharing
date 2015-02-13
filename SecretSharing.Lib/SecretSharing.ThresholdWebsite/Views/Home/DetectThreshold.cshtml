@@ -1,0 +1,152 @@
+﻿@{
+    Layout = null;
+}
+
+<!DOCTYPE html>
+
+<html>
+<head>
+    <meta name="viewport" content="width=device-width" />
+    <title>Threshold Recognizer!</title>
+    <link href="~/Content/bootstrap.min.css" rel="stylesheet" />
+    <script src="~/Scripts/jquery-1.9.1.min.js"></script>
+    <script src="~/Scripts/bootstrap.min.js"></script>
+</head>
+<body>
+
+
+    <div class="panel panel-default">
+        <div class="panel-heading"><h1>Threshold detection</h1> by Mohsen Ahmadvand, <a href="https://github.com/mersad00/secret-sharing"> avaliable on github</a></div>
+        <div class="panel-body">
+            It turned out that n-choose-r combination detection for given input can be useful in cryptography and other sections.
+
+            This simple application demonstartes an efficient threshold detection algorithm.
+            So if you feel lost in this page, here is user manual: simply enter your access structure in the inputbox and press "Find Threshold". Enjoy!
+        </div>
+        </div>
+    @using (Html.BeginForm("DetectThreshold", "Home"))
+    {
+        <form class="form-horizontal">
+            <fieldset>
+
+                <!-- Form Name -->
+                <legend>Threshold Recognizer</legend> <!-- Text input-->
+                <div class="form-group">
+                    <label class="col-md-8 control-label" for="accessText">Access Structure</label>
+                    <div class="col-md-8">
+                        @Html.TextBox("access", null, new { @class = "form-control input-md", required = "" })
+                        <!--<input id="accessText" name="accessText" type="text" placeholder="placeholder" class="form-control input-md" required="">-->
+                        <span class="help-block"> <strong>Examples:</strong><br /> P2^P3,P1^P2^P4,P1^P3^P4<br />
+            P1^P3^P4,P1^P2,P2^P3<br />
+            P1^P3^P4,P1^P2,P2^P3,P2^P4<br />
+            P1^P2^P3,P1^P2^P4,P1^P3^P4<br />
+            No threshold: P1^P2,P2^P3,P3^p4,p4^p5,p5^p6,p6^p7,p7^p8,p8^p1<br />
+            Tricky threshold: p1^p2^p3,p2^p3^p4,p1^p3^p4,p1^p2^p4,p4^p5^p6,p4^p5^p7,p4^p6^p7
+                        </span>
+                        <div class="control-group error">
+                           @if (ViewBag.error != null)
+                                { <span class="bg-danger">
+                               
+                                    @ViewBag.error
+                                
+                        </span>}
+                        </div>
+                </div>
+
+                <!-- Button -->
+                <div class="form-group">
+                    <label class="col-md-8 control-label" for="singlebutton"></label>
+                    <div class="col-md-8">
+                        <button class="btn btn-primary" value="DetectThreshold" type="submit">Find Threshold</button>
+                    </div>
+                </div>
+                <br />
+    </fieldset>
+    </form>
+    }
+                <div class="panel panel-default">
+                    <div class="panel-heading">Output</div>
+                    <div class="panel-body">
+                        <!-- Textarea -->
+                        <div class="form-group">
+                            <label class="col-md-8 control-label" for="thresholdsText">Detected Thresholds</label>
+                            <div class="col-md-8">
+                                <textarea class="form-control" id="thresholdsText" name="thresholdsText">
+                                    @if (ViewBag.thresholds != null)
+                                    {
+                                        foreach (var th in ViewBag.thresholds)
+                                        {
+                                            @th
+                                            @Environment.NewLine
+                                        }
+                                    }
+
+                                </textarea>
+                            </div>
+                        </div>
+
+                        <!-- Textarea -->
+                        <div class="form-group">
+                            <label class="col-md-8 control-label" for="expandedText">Expanded sets</label>
+                            <div class="col-md-8">
+                                <textarea class="form-control" id="expandedText" name="expandedText">
+                                    @if (ViewBag.expanded != null)
+                                    {
+                                        foreach (var qs in ViewBag.expanded)
+                                        {
+                                            @qs
+                                            @Environment.NewLine
+                                        }
+                                    }
+                                </textarea>
+                            </div>
+                        </div>
+
+                        <!-- Textarea -->
+                        <div class="form-group">
+                            <label class="col-md-8 control-label" for="remainsText">Not covered subsets in the threshold(s)</label>
+                            <div class="col-md-8">
+                                <textarea class="form-control" id="remainsText" name="remainsText">
+                                    @if (ViewBag.remaining != null)
+                                    {
+                                        foreach (var re in ViewBag.remaining)
+                                        {
+                                            @re
+                                            @Environment.NewLine
+                                        }
+                                    }
+                                </textarea>
+                            </div>
+                        </div>
+                    </div>
+                        <div class="panel panel-default">
+                            <div class="panel-heading">Trace info</div>
+                            <div class="panel-body">
+                                <!-- Textarea -->
+                                <div class="form-group">
+                                    <label class="col-md-8 control-label">Elapsed seconds: @ViewBag.elapsedSeconds</label>
+                                    <label class="col-md-8 control-label">
+                                        Number of attempts:@if (ViewBag.attempts != null)
+                                        {@ViewBag.attempts.Count}
+                                    </label>
+                                    <br />
+                                    <label class="col-md-8 control-label" for="attemptsText">Trace of threshold detection process:</label>
+                                    <div class="col-md-8">
+                                        <textarea class="form-control" id="attemptsText" name="attemptsText">
+                                            @if (ViewBag.attempts != null)
+                                            {
+                                                foreach (var re in ViewBag.attempts)
+                                                {
+                                                    @re
+                                                    @Environment.NewLine
+                                                }
+                                            }
+                                        </textarea>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        
+                    </div>
+</body>
+</html>
