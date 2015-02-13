@@ -58,12 +58,13 @@ namespace SecretSharing.ProfilerRunner
                 var candidateSets = qualifiedExpandedSubset.Where(po => po.Parties.Count == th.Depth);
 
                 ///find threshold in sets
-                var threshold = ThresholdSubset.findThreshold(candidateSets, th.Depth, trustees.Count);
-                if (threshold == null || threshold.Count == 0)
-                {
-                    //maybe it has a fixed item let's try with fixed item threshold detector
-                    threshold = ThresholdSubset.findFixedConcatThreshold(candidateSets, th.Depth, trustees.Count);
-                }
+                var threshold = ThresholdSubset.findThreshold(candidateSets, th.Depth, trustees.Count,
+                    ThresholdSubset.GetNextPossibleCombiantion(trustees.Count,th.Depth,candidateSets.Count()));
+                //if (threshold == null || threshold.Count == 0)
+                //{
+                //    //maybe it has a fixed item let's try with fixed item threshold detector
+                //    threshold = ThresholdSubset.findFixedConcatThreshold(candidateSets, th.Depth, trustees.Count);
+                //}
 
                 if (threshold != null && threshold.Count != 0)
                 {

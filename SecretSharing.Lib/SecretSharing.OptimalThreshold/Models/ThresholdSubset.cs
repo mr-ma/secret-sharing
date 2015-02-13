@@ -115,7 +115,7 @@ namespace SecretSharing.ProfilerRunner.Models
             }
             return thresholds.Except(alreadyIncludedThresholds).ToList();
         }
-        public static List<ThresholdSubset> findFixedConcatThreshold(IEnumerable<QualifiedSubset> candidateSets, int depth, int allparties)
+        public static List<ThresholdSubset> findFixedConcatThreshold(IEnumerable<QualifiedSubset> candidateSets, int depth, int allparties,int possibleCombination)
         {
             int allsentences = candidateSets.Count();
 
@@ -124,9 +124,11 @@ namespace SecretSharing.ProfilerRunner.Models
             //fixed element normal case : just a fixed element in front of threshold candidates
             var fixedIntersection = candidateSets.Select(po => po.Parties).Aggregate((first, second) => first.Intersect(second).ToList());
 
-            //add trace 
+               //add trace 
             attemptTrace.Add(string.Format("Set:{0}, Attempted fixed item:{1} + threshold:({2},{3})", QualifiedSubset. DumpElementsIntoSingleString(candidateSets)
-                , new QualifiedSubset(fixedIntersection).ToString(), depth, allparties));
+             , new QualifiedSubset(fixedIntersection).ToString(), depth, allparties));
+           
+               
 
             if (fixedIntersection.Count > 0)
             {
@@ -141,7 +143,7 @@ namespace SecretSharing.ProfilerRunner.Models
                         smallerQS.Add(tempqs);
                     }
                 }
-                var threshold = findThreshold(smallerQS, depth - fixedIntersection.Count, QualifiedSubset.GetAllInvolvedParties(smallerQS).Parties.Count);
+                var threshold = findThreshold(smallerQS, depth - fixedIntersection.Count, QualifiedSubset.GetAllInvolvedParties(smallerQS).Parties.Count,possibleCombination,false);
                 if (threshold != null)
                 //now add the fixed part to the threshold
                 {
@@ -149,34 +151,90 @@ namespace SecretSharing.ProfilerRunner.Models
                     {
                         th.fixedParties = fixedIntersection;
                     }
+                    
                     return threshold;
                 }
             }
-            return null;
+            return new List<ThresholdSubset>();
         }
 
-        public static List<ThresholdSubset> findThreshold(IEnumerable<QualifiedSubset> candidateSets, int depth, int allparties)
+        //public static List<ThresholdSubset> findThreshold(IEnumerable<QualifiedSubset> candidateSets, int depth, int allparties)
+        //{
+        //    int allsentences = candidateSets.Count();
+
+        //    // normal case
+        //    List<ThresholdSubset> thresholds = new List<ThresholdSubset>();
+        //    var ncr = nCr(allparties, depth);
+
+        //    //add trace 
+        //    attemptTrace.Add(string.Format("Set:{0}, Attempted threshold:({1},{2})", QualifiedSubset.DumpElementsIntoSingleString(candidateSets), depth, allparties));
+
+        //    if (ncr == allsentences)
+        //    {
+        //        //TODO: check frequencies too
+        //        //bool allHaveEqualFrequency = IsAllPartiesFrequencyEqual(candidateSets);
+        //        //if (allHaveEqualFrequency)
+        //        //{
+        //            ThresholdSubset th = new ThresholdSubset(allparties, depth, new List<Trustee>(), QualifiedSubset.GetAllInvolvedParties(candidateSets).Parties);
+        //            thresholds.Add(th);
+        //        //}
+        //    }
+        //    /// if the candidate set is larger than nCr then probably some sets don't belong to the threshold 
+        //    /// Here we recusrively rotate parties and select all possible combinations to see which ones are 
+        //    /// building threshold for e.g. p1p2p3 p2p3p4 p1p3p4 p1p2p4 p2p4p5 
+        //    else if (allsentences < ncr)
+        //    {
+        //        //all possible candidate sets must be generated and recursively called
+        //        if (allsentences > 2)
+        //        {
+        //            var nextPossibleCombination = GetNextPossibleCombiantion(allparties, depth, allsentences);
+        //            while (nextPossibleCombination != 1)
+        //            {
+        //                var smallersetcombinations = candidateSets.Combinations(nextPossibleCombination);
+        //                foreach (var smallerset in smallersetcombinations)
+        //                {
+        //                        var newallparties = QualifiedSubset.GetAllInvolvedParties(smallerset).Parties.Count;
+        //                        IEnumerable<ThresholdSubset> foundthresholds;
+        //                        if (newallparties == nextPossibleCombination)
+        //                        {
+        //                            foundthresholds = findThreshold(smallerset, depth, newallparties);
+        //                        }
+        //                        ///try filtering the fixed sets maybe find a threshold 
+        //                        else 
+        //                        {
+        //                            foundthresholds = findFixedConcatThreshold(smallerset, depth, newallparties);
+        //                        }
+        //                        if (foundthresholds != null)
+        //                        {
+        //                            thresholds.AddRange(foundthresholds);
+        //                        }
+        //                }
+        //                nextPossibleCombination --;
+        //            }
+
+        //        }
+        //    }
+
+        //    return thresholds;
+        //}
+
+
+
+
+
+        public static List<ThresholdSubset> findThreshold(IEnumerable<QualifiedSubset> candidateSets, int depth, int allparties,int possibleCombination, bool findIntersection = true)
         {
             int allsentences = candidateSets.Count();
-
-            //if (depth == 1) return null;
+            //add trace 
+            attemptTrace.Add(string.Format("Set:{0}, Attempted threshold:({1},{2})", QualifiedSubset.DumpElementsIntoSingleString(candidateSets), depth, allparties));
 
             // normal case
             List<ThresholdSubset> thresholds = new List<ThresholdSubset>();
             var ncr = nCr(allparties, depth);
-
-            //add trace 
-            attemptTrace.Add(string.Format("Set:{0}, Attempted threshold:({1},{2})", QualifiedSubset.DumpElementsIntoSingleString(candidateSets), depth, allparties));
-
             if (ncr == allsentences)
             {
-                //TODO: check frequencies too
-                //bool allHaveEqualFrequency = IsAllPartiesFrequencyEqual(candidateSets);
-                //if (allHaveEqualFrequency)
-                //{
-                    ThresholdSubset th = new ThresholdSubset(allparties, depth, new List<Trustee>(), QualifiedSubset.GetAllInvolvedParties(candidateSets).Parties);
-                    thresholds.Add(th);
-                //}
+                ThresholdSubset th = new ThresholdSubset(allparties, depth, new List<Trustee>(), QualifiedSubset.GetAllInvolvedParties(candidateSets).Parties);
+                thresholds.Add(th);
             }
             /// if the candidate set is larger than nCr then probably some sets don't belong to the threshold 
             /// Here we recusrively rotate parties and select all possible combinations to see which ones are 
@@ -186,36 +244,32 @@ namespace SecretSharing.ProfilerRunner.Models
                 //all possible candidate sets must be generated and recursively called
                 if (allsentences > 2)
                 {
-                    var nextPossibleCombination = GetNextPossibleCombiantion(allparties, depth, allsentences);
-                    while (nextPossibleCombination != 1)
+                    var smallersetcombinations = candidateSets.Combinations(possibleCombination);
+                    foreach (var smallerset in smallersetcombinations)
                     {
-                        var smallersetcombinations = candidateSets.Combinations(nextPossibleCombination);
-                        foreach (var smallerset in smallersetcombinations)
+                        var newallparties = QualifiedSubset.GetAllInvolvedParties(smallerset).Parties.Count;
+                        List<ThresholdSubset> foundthresholds=new List<ThresholdSubset>();
+                        if (newallparties == possibleCombination)
                         {
-                                var newallparties = QualifiedSubset.GetAllInvolvedParties(smallerset).Parties.Count;
-                                IEnumerable<ThresholdSubset> foundthresholds;
-                                if (newallparties == nextPossibleCombination)
-                                {
-                                    foundthresholds = findThreshold(smallerset, depth, newallparties);
-                                }
-                                ///try filtering the fixed sets maybe find a threshold 
-                                else 
-                                {
-                                    foundthresholds = findFixedConcatThreshold(smallerset, depth, newallparties);
-                                }
-                                if (foundthresholds != null)
-                                {
-                                    thresholds.AddRange(foundthresholds);
-                                }
+                            foundthresholds = findThreshold(smallerset, depth, newallparties, possibleCombination,findIntersection);
                         }
-                        nextPossibleCombination --;
+                        ///try filtering the fixed sets maybe find a threshold 
+                        else if(findIntersection)
+                        {
+                            foundthresholds = findFixedConcatThreshold(smallerset, depth, newallparties, possibleCombination);
+                        }
+                        thresholds.AddRange(foundthresholds);
                     }
-
+                    if (--possibleCombination != 1)
+                        thresholds.AddRange(findThreshold(candidateSets, depth, allparties, possibleCombination,findIntersection));
                 }
+
+         
             }
 
             return thresholds;
         }
+
         static int nCr(int m, int n)
         {
             int tmp = 1;
@@ -236,7 +290,7 @@ namespace SecretSharing.ProfilerRunner.Models
             return tmp;
         }
 
-        static int GetNextPossibleCombiantion(int allParties, int depth, int allsentences)
+        public static int GetNextPossibleCombiantion(int allParties, int depth, int allsentences)
         {
 
             var a = nCr(allParties, depth);
