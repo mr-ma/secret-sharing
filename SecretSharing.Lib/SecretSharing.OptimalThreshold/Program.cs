@@ -24,13 +24,14 @@ namespace SecretSharing.ProfilerRunner
                     var thresholds = new List<ThresholdSubset>();
                     var remaining = new List<QualifiedSubset>();
                     var attempts = new List<String>();
-                    ThresholdHelper.ServeThresholdDetection(acc, out expanded, out  qualified, out  thresholds, out attempts, out remaining);
+                    var tryIntersect = true;
+                    ThresholdHelper.ServeThresholdDetection(acc, tryIntersect, out expanded, out  qualified, out  thresholds, out attempts, out remaining);
                     //foreach (var att in attempts)
                     //{
                     //    Console.WriteLine(att);
                     //}      
-                    Console.WriteLine("all attempts:{0}",attempts.Count);
-
+                    Console.WriteLine("all threshold attempts:{0}",attempts.Count);
+                    Console.WriteLine("all fixed threshold attempts:{0}", ThresholdSubset.fixedAttemptTrace.Count);
                     Console.WriteLine("all found thresholds:");
                     foreach (var thre in thresholds)
                     {

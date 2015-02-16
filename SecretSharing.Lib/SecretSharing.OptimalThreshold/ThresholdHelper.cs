@@ -11,11 +11,12 @@ namespace SecretSharing.ProfilerRunner
     public static class ThresholdHelper
     {
        
-        public static void ServeThresholdDetection(AccessStructure access, out List<QualifiedSubset> expandedSet
+        public static void ServeThresholdDetection(AccessStructure access, bool tryIntersect, out List<QualifiedSubset> expandedSet
            , out  List<QualifiedSubset> qualifiedSet, out List<ThresholdSubset> thresholds, out List<string> attempts,
            out List<QualifiedSubset> notMatchingSet)
         {
             ThresholdSubset.attemptTrace = new List<string>();
+            ThresholdSubset.fixedAttemptTrace = new List<string>();
 
             List<Trustee> trustees = access.GetAllParties().OrderBy(po => po.partyId).ToList();
 
@@ -59,13 +60,7 @@ namespace SecretSharing.ProfilerRunner
 
                 ///find threshold in sets
                 var threshold = ThresholdSubset.findThreshold(candidateSets, th.Depth, trustees.Count,
-                    ThresholdSubset.GetNextPossibleCombiantion(trustees.Count,th.Depth,candidateSets.Count()));
-                //if (threshold == null || threshold.Count == 0)
-                //{
-                //    //maybe it has a fixed item let's try with fixed item threshold detector
-                //    threshold = ThresholdSubset.findFixedConcatThreshold(candidateSets, th.Depth, trustees.Count);
-                //}
-
+                    ThresholdSubset.GetNumberOfRequiredSetsForThreshold(trustees.Count,th.Depth,candidateSets.Count()),tryIntersect);
                 if (threshold != null && threshold.Count != 0)
                 {
                     thresholdsubsets.AddRange(threshold);
@@ -74,7 +69,7 @@ namespace SecretSharing.ProfilerRunner
             }
 
 
-            /*foreach (ThresholdSubset th in ThresholdSubset.CheckInclusiveThresholds(thresholdsubsets.Distinct()))
+            foreach (ThresholdSubset th in ThresholdSubset.CheckInclusiveThresholds(thresholdsubsets.Distinct()))
             {
                 Console.WriteLine(th);
                 var coveredsets = ThresholdSubset.ExploreAllSubsets(th);
@@ -82,8 +77,8 @@ namespace SecretSharing.ProfilerRunner
                 //DumpElements(coveredsets);
 
                 qualifiedExpandedSubset = qualifiedExpandedSubset.Except(coveredsets).ToList();
-            }*/
-            thresholds = thresholdsubsets.Distinct().ToList();
+            }
+            thresholds = ThresholdSubset.CheckInclusiveThresholds(thresholdsubsets.Distinct()).ToList();
             notMatchingSet = qualifiedExpandedSubset.ToList();
 
             attempts = ThresholdSubset.attemptTrace;
