@@ -1,4 +1,4 @@
-﻿using SecretSharing.ProfilerRunner.Models;
+﻿using SecretSharing.OptimalThreshold.Models;
 using System;
 using System.Collections.Generic;
 using System.Drawing;
@@ -7,7 +7,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace SecretSharing.ProfilerRunner
+namespace SecretSharing.OptimalThreshold
 {
     static class Program
     {
@@ -18,7 +18,8 @@ namespace SecretSharing.ProfilerRunner
         {
             //p1^p2^p3,p2^p3^p4,p1^p3^p4,p1^p2^p4,p4^p5^p6,p4^p5^p7,p4^p6^p7
             //P1^P2,P2^P3,P3^p4,p3^p5,p3^p6,p6^p7,p7^p8,p8^p1
-            AccessStructure acc = new AccessStructure("p1^p2^p3,p2^p3^p4,p1^p3^p4,p1^p2^p4,p4^p5^p6,p4^p5^p7,p4^p6^p7");
+            //P1^P2,P2^P3,P3^p4,p4^p5,p5^p6,p6^p7,p7^p8,p8^p1
+            AccessStructure acc = new AccessStructure("P1^P2,P2^P3,P3^p4,p4^p5,p5^p6,p6^p7,p7^p8,p8^p1");
                        var expanded = new List<QualifiedSubset>();
                     var qualified = new List<QualifiedSubset>();
                     var thresholds = new List<ThresholdSubset>();
@@ -43,19 +44,6 @@ namespace SecretSharing.ProfilerRunner
                         Console.WriteLine(thre);
                     }
             Console.Read();
-            return;
-
-           // permutation(3, "1234");
-           // Console.Read();
-           // Console.WriteLine(produceList()) ;
-            // qualified subsets for minimal access structure
-            //P2^P3,P1^P2^P4,P1^P3^P4
-            //P1^P3^P4,P1^P2,P2^P3
-            //P1^P3^P4,P1^P2,P2^P3,P2^P4
-            //P1^P2^P3,P1^P2^P4,P1^P3^P4
-            //no threshold: P1^P2,P2^P3,P3^p4,p4^p5,p5^p6,p6^p7,p7^p8,p8^p1
-            //threshold ruiner: p1^p2^p3,p2^p3^p4,p1^p3^p4,p1^p2^p4,p4^p5^p6,p4^p5^p7,p4^p6^p7
-            Console.ReadLine();
             return;
         }
 

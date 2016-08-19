@@ -1,5 +1,5 @@
-﻿using SecretSharing.ProfilerRunner;
-using SecretSharing.ProfilerRunner.Models;
+﻿using SecretSharing.OptimalThreshold;
+using SecretSharing.OptimalThreshold.Models;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -34,7 +34,8 @@ namespace SecretSharing.ThresholdWebsite.Controllers
                     var thresholds = new List<ThresholdSubset>();
                     var remaining = new List<QualifiedSubset>();
                     var attempts = new List<String>();
-                    ThresholdHelper.ServeThresholdDetection(acc, out expanded, out  qualified, out  thresholds, out attempts, out remaining);
+                    var tryIntersect = true;
+                    ThresholdHelper.ServeThresholdDetection(acc,tryIntersect, out expanded, out  qualified, out  thresholds, out attempts, out remaining);
 
                     ViewBag.expanded = expanded;
                     ViewBag.qualified = qualified;

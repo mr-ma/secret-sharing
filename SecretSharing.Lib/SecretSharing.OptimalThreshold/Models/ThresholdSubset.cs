@@ -5,16 +5,16 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 
-namespace SecretSharing.ProfilerRunner.Models
+namespace SecretSharing.OptimalThreshold.Models
 {
-    public class ThresholdSubset
+    public class ThresholdSubset:ISubset
     {
         public static List<String> attemptTrace;
         public static List<String> fixedAttemptTrace;
 
         public IEnumerable<Trustee> fixedParties;
         public IEnumerable<Trustee> thresholdParties;
-        int N, K;
+        public int N, K;
         public ThresholdSubset(int N, int K, IEnumerable<Trustee> fixedParties, IEnumerable<Trustee> thresholdParties)
         {
             this.fixedParties = fixedParties;
@@ -212,7 +212,10 @@ namespace SecretSharing.ProfilerRunner.Models
                     {
                         foundthresholds = findFixedConcatThreshold(smallerset, k, newallparties, NRSFT);
                     }
-                    thresholds.AddRange(foundthresholds);
+                    if (foundthresholds != null)
+                    {
+                        thresholds.AddRange(foundthresholds);
+                    }
 
                 }
                 if (--NRSFT > 1)
@@ -295,5 +298,24 @@ namespace SecretSharing.ProfilerRunner.Models
 
         #endregion
 
+
+        public int getPartiesCount()
+        {
+            return this.fixedParties.Count()+ this.K;
+        }
+
+
+        public int getShareBranchesCount()
+        {
+            return this.fixedParties.Count() + this.N;
+        }
+
+
+        public int getPartyId(int index)
+        {
+            if (index < fixedParties.Count())
+                return fixedParties.ToList()[index].GetPartyId();
+            return -1;
+        }
     }
 }

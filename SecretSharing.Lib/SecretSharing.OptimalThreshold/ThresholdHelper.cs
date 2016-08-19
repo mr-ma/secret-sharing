@@ -1,12 +1,12 @@
 ﻿
-using SecretSharing.ProfilerRunner.Models;
+using SecretSharing.OptimalThreshold.Models;
 using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace SecretSharing.ProfilerRunner
+namespace SecretSharing.OptimalThreshold
 {
     public static class ThresholdHelper
     {
@@ -68,21 +68,66 @@ namespace SecretSharing.ProfilerRunner
 
             }
 
-
-            foreach (ThresholdSubset th in ThresholdSubset.CheckInclusiveThresholds(thresholdsubsets.Distinct()))
+            var uniqueInclusiveThresholds = ThresholdSubset.CheckInclusiveThresholds(thresholdsubsets.Distinct());
+            foreach (ThresholdSubset th in uniqueInclusiveThresholds)
             {
                 Console.WriteLine(th);
                 var coveredsets = ThresholdSubset.ExploreAllSubsets(th);
-                // Console.WriteLine("covered sets:");
-                //DumpElements(coveredsets);
-
                 qualifiedExpandedSubset = qualifiedExpandedSubset.Except(coveredsets).ToList();
             }
-            thresholds = ThresholdSubset.CheckInclusiveThresholds(thresholdsubsets.Distinct()).ToList();
+            thresholds = uniqueInclusiveThresholds.ToList();
             notMatchingSet = qualifiedExpandedSubset.ToList();
 
             attempts = ThresholdSubset.attemptTrace;
         }
+
+        public static void DetectThresholds(AccessStructure access,bool tryIntersect, out List<ThresholdSubset> thresholds, out List<QualifiedSubset> notMatchingSet)
+        {
+            var expanded = new List<QualifiedSubset>();
+            var qualified = new List<QualifiedSubset>();
+            var attempts = new List<String>();
+            ThresholdHelper.ServeThresholdDetection(access,tryIntersect, out expanded, out  qualified, out  thresholds, out attempts, out notMatchingSet);
+        }
+
+
+        public static AccessStructure OptimiseAccessStructure(AccessStructure access,bool tryIntersect)
+        {
+            var thresholds = new List<ThresholdSubset>();
+            var remaining = new List<QualifiedSubset>();
+            DetectThresholds(access, tryIntersect, out thresholds, out remaining);
+            if(IsThresholdShareShorter(access,thresholds,remaining)){
+                var optimisedAccess = new AccessStructure();
+                optimisedAccess.Accesses.AddRange(thresholds);
+                optimisedAccess.Accesses.AddRange(remaining);
+                return optimisedAccess;
+            }
+            return access;
+        }
+
+        public static bool IsThresholdShareShorter(AccessStructure access, List<ThresholdSubset> thresholds
+            , List<QualifiedSubset> notMatchingSet)
+        {
+            // caclulate shares given in case of using thresholds
+            var sumThresholdShare = 0;
+            foreach (var th in thresholds)
+            {
+                sumThresholdShare += th.getPartiesCount();
+            }
+            //append shares from the not matching sets
+            foreach (var qs in notMatchingSet)
+            {
+                sumThresholdShare += qs.Parties.Count;
+            }
+            var sumNoThreshold = 0;
+            //now let's see how it would be if we just divide simply
+            foreach (var qs in access.Accesses)
+            {
+                sumNoThreshold += qs.getPartiesCount();
+            }
+            return sumThresholdShare < sumNoThreshold;
+        }
+
+ 
 
         public static IEnumerable<IEnumerable<T>> Combinations<T>(this IEnumerable<T> elements, int k)
         {

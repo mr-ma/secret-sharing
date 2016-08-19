@@ -6,6 +6,14 @@ using System.Threading.Tasks;
 
 namespace SecretSharing.Benchmark
 {
+    public class PrimePersistanceReport
+    {
+        public List<LoadedPrimeNumber> Primes { get; set; }
+    }
+    public class BenalohPersistanceReport
+    {
+        public List<BenalohLeichterBenchmarkReportSet> Reports { get; set; }
+    }
     public class PersistanceReport
     {
         public List<SecretSharingBenchmarkReport> Reports { get; set; }

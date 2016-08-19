@@ -3,9 +3,9 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 
-namespace SecretSharing.ProfilerRunner.Models
+namespace SecretSharing.OptimalThreshold.Models
 {
-    public class Trustee
+    public class Trustee:IComparable
     {
         public int partyId;
         public Trustee(int id)
@@ -49,6 +49,12 @@ namespace SecretSharing.ProfilerRunner.Models
         public override String ToString()
         {
             return "P" + this.partyId.ToString();
+        }
+
+        public int CompareTo(object obj)
+        {
+            if (obj == null || obj.GetType()!= this.GetType()) return 0;
+            return this.partyId.CompareTo( ((Trustee)obj).partyId);
         }
     }
 }

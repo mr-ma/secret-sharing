@@ -3,10 +3,10 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 
-namespace SecretSharing.ProfilerRunner.Models
+namespace SecretSharing.OptimalThreshold.Models
 {
 
-    public class QualifiedSubset 
+    public class QualifiedSubset :IComparable,ISubset
     {
         public List<Trustee> Parties;
         public QualifiedSubset()
@@ -89,16 +89,48 @@ namespace SecretSharing.ProfilerRunner.Models
             }
             return sb.ToString();
         }
+
+        string strValue = null;
         public override String ToString()
         {
-            IEnumerable<String> stringified = Parties.Select(po => po.ToString());
-            if (stringified.Count() > 0)
+            if (strValue == null)
             {
-                var re = stringified.Aggregate((current, next) => current + "," + next);
-                return re;
+                IEnumerable<String> stringified = Parties.Select(po => po.ToString());
+                if (stringified.Count() > 0)
+                {
+                    strValue = "(" + stringified.Aggregate((current, next) => current + "∧" + next) + ")";
+
+                }
+                else
+                {
+                    strValue = "";
+                }
             }
-            return "";
+            return strValue;
         }
 
+
+        public int getPartiesCount()
+        {
+            return this.Parties.Count;
+        }
+
+
+        public int getShareBranchesCount()
+        {
+            return getPartiesCount();
+        }
+
+
+        public int getPartyId(int index)
+        {
+            return this.Parties[index].GetPartyId();
+        }
+
+        public int CompareTo(object obj)
+        {
+            if (obj == null || obj.GetType() != this.GetType()) return 0;
+            return this.ToString().CompareTo(((QualifiedSubset)obj).ToString());
+        }
     }
 }

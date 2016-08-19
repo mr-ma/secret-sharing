@@ -11,200 +11,241 @@ using System.IO;
 
 namespace SecretSharing.Benchmark
 {
-   public class PDFGenerator
+    public class PDFGenerator
     {
 
-       public void GenBenchmarkDoc(string filePath, IEnumerable<SecretSharingBenchmarkReport> reports=null)
-       {
-           if (reports == null || reports.Count() == 0) return;
-           Document doc = new Document(PageSize.A4);
-           PdfWriter.GetInstance(doc, new FileStream(filePath, FileMode.Create));
-           doc.Open();
-           
-           PdfPTable table1 = new PdfPTable(12);
-           table1.WidthPercentage = 90;
-
-
-           
-           bool firsttime=true;
-           ///rest of the header k values
-           for (int n = 0; n < 11; n ++)
-           {
-               PdfPCell[] cells = new PdfPCell[12];
-               PdfPCell ncell;
-               if (firsttime)
-               {
-                   ////add header of key size to very left
-                   ncell = new PdfPCell();
-                   ncell.AddElement(new Paragraph(reports == null ? "80 bits" : reports.First().keyLength + " bits"));
-                   firsttime = false;
-               }
-               else
-               {
-                   ncell = new PdfPCell();
-                   ncell.AddElement(new Paragraph(n == 1 ? "n=5" : (n*5).ToString()));
-               }
-               cells[0] = ncell;
-
-               for (int k = 0; k < 11; k++)
-               {
-                   PdfPCell kcell = new PdfPCell();
-                   if (n==0)
-                   {
-                       kcell.AddElement(new Paragraph(k == 0 ? "k=1" : (k * 5).ToString()));
-                   } 
-                   else if (reports !=null && k <= n )
-                   {
-                       //add values here
-
-                       var val= reports.Where(po => po.n == n * 5 && po.k == (k==0?1:k*5));
-                       if (val.Count()>0)
-                       {
-                           var re = val.First();
-                           kcell.AddElement(new Paragraph(re.TotalElapsedMilliseconds.ToString("F0")));
-                       }
-                   }
-                   cells[k + 1] = kcell;
-               }
-               PdfPRow row = new PdfPRow(cells);
-               table1.Rows.Add(row);
-           }
-           doc.Add(table1);
-           doc.Close();
-
-       }
-
-       public void GenHello()
-       {
-           Document doc = new Document(PageSize.A4);
-           PdfWriter.GetInstance(doc, new FileStream("hello.pdf", FileMode.Create));
-           doc.Open();
-           PdfPTable table1 = new PdfPTable(2);
-           table1.WidthPercentage = 90;
-
-           PdfPCell cell11 = new PdfPCell();
-
-           cell11.AddElement(new Paragraph("Receipt ID : "));
-
-           cell11.AddElement(new Paragraph("Date : "));
-
-           cell11.AddElement(new Paragraph("Photo Status : "));
-
-           cell11.VerticalAlignment = Element.ALIGN_LEFT;
-
-           PdfPCell cell12 = new PdfPCell();
-
-           cell12.AddElement(new Paragraph("Transaction ID : "));
-
-           cell12.AddElement(new Paragraph("Expected Date Of Delivery : "));
-
-           cell12.VerticalAlignment = Element.ALIGN_RIGHT;
-
-
-
-           table1.AddCell(cell11);
-
-           table1.AddCell(cell12);
-
-
-
-           PdfPTable table2 = new PdfPTable(3);
-
-
-
-           //One row added
-
-           PdfPCell cell21 = new PdfPCell();
-
-           cell21.AddElement(new Paragraph("Photo Type"));
-
-           PdfPCell cell22 = new PdfPCell();
-
-           cell22.AddElement(new Paragraph("No. of Copies"));
-
-           PdfPCell cell23 = new PdfPCell();
-
-           cell23.AddElement(new Paragraph("Amount"));
-
-
-
-           table2.AddCell(cell21);
-
-           table2.AddCell(cell22);
-
-           table2.AddCell(cell23);
-
-
-
-           //New Row Added
-
-           PdfPCell cell31 = new PdfPCell();
-
-           cell31.AddElement(new Paragraph("type"));
-
-           cell31.FixedHeight = 300.0f;
-
-           PdfPCell cell32 = new PdfPCell();
-
-           cell32.AddElement(new Paragraph("noofcopy"));
-
-           cell32.FixedHeight = 300.0f;
-
-           PdfPCell cell33 = new PdfPCell();
-
-           cell33.AddElement(new Paragraph("20.00 * "));// + noOfCopy + " = " + (20 * Convert.ToInt32(noOfCopy)) + ".00"));
-
-           cell33.FixedHeight = 300.0f;
-
-
-
-           table2.AddCell(cell31);
-
-           table2.AddCell(cell32);
-
-           table2.AddCell(cell33);
-
-
-
-           PdfPCell cell2A = new PdfPCell(table2);
-
-           cell2A.Colspan = 2;
-
-           table1.AddCell(cell2A);
-
-           PdfPCell cell41 = new PdfPCell();
-
-           cell41.AddElement(new Paragraph("Name : "));
-
-           cell41.AddElement(new Paragraph("Advance : "));
-
-           cell11.VerticalAlignment = Element.ALIGN_LEFT;
-
-           PdfPCell cell42 = new PdfPCell();
-
-           cell42.AddElement(new Paragraph("Customer ID : "));
-
-           cell42.AddElement(new Paragraph("Balance : "));
-
-           cell42.VerticalAlignment = Element.ALIGN_RIGHT;
-
-
-
-           table1.AddCell(cell41);
-
-           table1.AddCell(cell42);
-
-
-
-           doc.Add(table1);
-
-           doc.Close();
-
-
-       }
-       public PDFGenerator()
-       {
-          
-       }
+        public struct TempValueHolder
+        {
+            public int n;
+            public int k;
+            public double avg;
+            public int keysize;
+        }
+        public static Dictionary<string, double> AggeragatedReconPhase = new Dictionary<string, double>();
+        public PdfPTable TableGenerator(int Columns, int Rows, string keysize, IEnumerable<SecretSharingBenchmarkReport> reports, IEnumerable<SecretSharingBenchmarkReport> comparereports = null)
+        {
+            List<double> improvments = new List<double>();
+            PdfPTable table1 = new PdfPTable(Columns);
+            table1.WidthPercentage = 100;
+            for (int r = 0; r < Rows; r++)
+            {
+                PdfPCell[] cells = new PdfPCell[Columns];
+                for (int c = 0; c < Columns; c++)
+                {
+                    PdfPCell columncell = new PdfPCell();
+                    if (c == 0) //add left top header column
+                    {
+                        if (r == 0) columncell.AddElement(new Paragraph(keysize));
+                        else if (r == 1)
+                            columncell.AddElement(new Paragraph("n=5"));
+                        else
+                            columncell.AddElement(new Paragraph((r * 5).ToString()));
+                    }
+                    else if (r == 0 && c != 0)
+                    {
+                        if (c == 1) columncell.AddElement(new Paragraph("k=5"));
+                        else
+                            columncell.AddElement(new Paragraph((c * 5).ToString()));
+                    }
+                    else if (reports != null && c <= r)
+                    {
+                        //Add corresponidng values from report
+
+                        var val = reports.Where(po => po.n == r * 5 && po.k == (c * 5));
+
+                        if (val.Count() > 0)
+                        {
+                            var re = val.First().ElapsedTicks.Average() / TimeSpan.TicksPerMillisecond;
+                            var firstValopr = val.First().Operation;
+                            if (firstValopr == SecretSharingBenchmarkReport.OperationType.RandomSecretReconstruction || firstValopr == SecretSharingBenchmarkReport.OperationType.DecryptShares || firstValopr == SecretSharingBenchmarkReport.OperationType.VerifyPooledShares)
+                            {
+                                var nstr = (r * 5).ToString();
+                                var kstr = (c * 5).ToString();
+                                var keystr = keysize+ nstr + ";" + kstr;
+                                var oldvalue = 0.0d;
+                                if (AggeragatedReconPhase.ContainsKey(keystr))
+                                {
+                                    oldvalue = AggeragatedReconPhase[keystr];
+                                }
+                                AggeragatedReconPhase[keystr] = oldvalue + re;
+                            }
+                            columncell.AddElement(new Paragraph((re).ToString("F2")));
+                            if (comparereports != null)
+                            {
+                                var compareval = comparereports.Where(po => po.n == r * 5 && po.k == (c * 5) && po.chunkSize == po.keyLength/8);
+
+                                if (compareval.Count() > 0)
+                                {
+                                    double comprativeResult = 0.00d;
+                                    if (compareval.First().ElapsedTicks == null)
+                                    {
+                                        comprativeResult = compareval.Single().TotalElapsedMilliseconds;
+                                    }
+                                    else
+                                    {
+                                        comprativeResult = compareval.Single().ElapsedTicks.Average() / TimeSpan.TicksPerMillisecond;
+                                    }
+                                    columncell.AddElement(new Paragraph(comprativeResult.ToString("F2")));
+                                    //columncell.AddElement(new Paragraph((compareval.Single().TotalElapsedMilliseconds).ToString()));
+                                    var improvement = (compareval.Single().TotalElapsedMilliseconds / re);
+                                    columncell.AddElement(new Paragraph((improvement).ToString("F2")));
+                                    improvments.Add(improvement);
+                                }
+                            }
+                        }
+                        //columncell.AddElement(new Paragraph("hello"));
+                    }
+                    cells[c] = columncell;
+                }
+                PdfPRow row = new PdfPRow(cells);
+                table1.Rows.Add(row);
+            }
+
+
+            if (improvments.Count > 0)
+            {
+                PdfPCell[] cells = new PdfPCell[Columns];
+                for (int i = 0; i < cells.Length; i++)
+                {
+                    cells[i] = new PdfPCell();
+                }
+                cells[0].AddElement(new Paragraph(string.Format("average:{0} std:{1}", improvments.Average(), StandardDeviation(improvments))));
+                table1.Rows.Add(new PdfPRow(cells));
+            }
+
+            return table1;
+
+        }
+
+        public PdfPTable TableAggregativeGenerator(int Columns, int Rows, string keysize, bool printImproves, IEnumerable<SecretSharingBenchmarkReport> comparereports = null)
+        {
+            List<double> improvments = new List<double>();
+            PdfPTable table1 = new PdfPTable(Columns);
+            table1.WidthPercentage = 100;
+            for (int r = 0; r < Rows; r++)
+            {
+                PdfPCell[] cells = new PdfPCell[Columns];
+                for (int c = 0; c < Columns; c++)
+                {
+                    PdfPCell columncell = new PdfPCell();
+                    if (c == 0) //add left top header column
+                    {
+                        if (r == 0) columncell.AddElement(new Paragraph(keysize));
+                        else if (r == 1)
+                            columncell.AddElement(new Paragraph("n=5"));
+                        else
+                            columncell.AddElement(new Paragraph((r * 5).ToString()));
+                    }
+                    else if (r == 0 && c != 0)
+                    {
+                        if (c == 1) columncell.AddElement(new Paragraph("k=5"));
+                        else
+                            columncell.AddElement(new Paragraph((c * 5).ToString()));
+                    }
+                    else if (AggeragatedReconPhase != null && c <= r)
+                    {
+                        //Add corresponidng values from report
+                        var nstr = (r * 5).ToString();
+                        var kstr = (c * 5).ToString();
+                        var keystr = keysize + nstr + ";" + kstr;
+                        var re = AggeragatedReconPhase[keystr];
+                        columncell.AddElement(new Paragraph((re).ToString("F2")));
+                        if (comparereports != null)
+                        {
+                            var compareval = comparereports.Where(po => po.n == r * 5 && po.k == (c * 5) && po.chunkSize ==po.keyLength/8);
+                            if (compareval.Count() > 0)
+                            {
+                                double comprativeResult = 0.00d;
+                                if (compareval.First().ElapsedTicks == null)
+                                {
+                                    comprativeResult = compareval.Single().TotalElapsedMilliseconds;
+                                }
+                                else
+                                {
+                                    comprativeResult = compareval.Single().ElapsedTicks.Average() / TimeSpan.TicksPerMillisecond;
+                                }
+                                columncell.AddElement(new Paragraph(comprativeResult.ToString("F2")));
+                                var improvement = (compareval.Single().TotalElapsedMilliseconds / re);
+                                if (printImproves)
+                                {
+                                    columncell.AddElement(new Paragraph((improvement).ToString("F2")));
+                                    improvments.Add(improvement);
+                                }
+                            }
+                        }
+                        //columncell.AddElement(new Paragraph("hello"));
+                    }
+                    cells[c] = columncell;
+                }
+                PdfPRow row = new PdfPRow(cells);
+                table1.Rows.Add(row);
+            }
+
+
+            if (improvments.Count > 0)
+            {
+                PdfPCell[] cells = new PdfPCell[Columns];
+                for (int i = 0; i < cells.Length; i++)
+                {
+                    cells[i] = new PdfPCell();
+                }
+                cells[0].AddElement(new Paragraph(string.Format("average:{0} std:{1}", improvments.Average(), StandardDeviation(improvments))));
+                table1.Rows.Add(new PdfPRow(cells));
+            }
+
+            return table1;
+
+        }
+
+        public double StandardDeviation(List<double> values)
+        {
+            var iterate = values.Count;
+            var averageE = values.Average();
+            var standardDivSum = values.Select(x => Math.Pow(x - averageE, 2)).Aggregate((current, next) => current + next);
+            var standardD = Math.Sqrt((1.0 / ((double)iterate)) * standardDivSum);
+            return standardD;
+        }
+
+
+        public void GenBenchmarkDoc(string filePath, IEnumerable<SecretSharingBenchmarkReport> reports, IEnumerable<SecretSharingBenchmarkReport> comparereports = null)
+        {
+            if (reports == null || reports.Count() == 0) return;
+            var pgSize = new iTextSharp.text.Rectangle(620, comparereports == null ? 275 : 730);
+            var doc = new iTextSharp.text.Document(pgSize, 10, 10, 10, 10);
+            //Document doc = new Document(PageSize.LETTER_LANDSCAPE);
+            PdfWriter.GetInstance(doc, new FileStream(filePath, FileMode.Create));
+            doc.Open();
+
+
+
+
+            var table1 = TableGenerator(11, 11, reports.First().keyLength / 2 + " bit", reports, comparereports);
+            doc.Add(table1);
+            doc.Close();
+
+        }
+
+        public void GenAggreagativeBenchmarkDoc(string filePath, int keyLength, bool printImproves,IEnumerable<SecretSharingBenchmarkReport> comparereports = null)
+        {
+            var pgSize = new iTextSharp.text.Rectangle(620, comparereports == null ? 275 : printImproves? 730:425);
+            var doc = new iTextSharp.text.Document(pgSize, 10, 10, 10, 10);
+            //Document doc = new Document(PageSize.LETTER_LANDSCAPE);
+            PdfWriter.GetInstance(doc, new FileStream(filePath, FileMode.Create));
+            doc.Open();
+
+
+
+
+            var table1 = TableAggregativeGenerator(11, 11, keyLength + " bit", printImproves,comparereports);
+            doc.Add(table1);
+            doc.Close();
+
+        }
+
+
+        public PDFGenerator()
+        {
+
+        }
     }
 }

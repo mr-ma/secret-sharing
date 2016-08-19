@@ -3,18 +3,28 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 
-namespace SecretSharing.ProfilerRunner.Models
+namespace SecretSharing.OptimalThreshold.Models
 {
     public class AccessStructure
     {
-        public List<QualifiedSubset> Accesses;
+        public List<ISubset> Accesses;
         public AccessStructure()
         {
-            this.Accesses = new List<QualifiedSubset>();
+            this.Accesses = new List<ISubset>();
+        }
+        public AccessStructure(IEnumerable<QualifiedSubset> subsets)
+        {
+            this.Accesses = new List<ISubset>();
+            this.Accesses.AddRange(subsets);
+        }
+        public static explicit operator AccessStructure(List<QualifiedSubset> qss)
+        {
+            var a = new AccessStructure(qss);
+            return a;
         }
         public AccessStructure(String minimalPath)
         {
-            this.Accesses = new List<QualifiedSubset>();
+            this.Accesses = new List<ISubset>();
             try
             {
                 string[] qualifiedsubsets = minimalPath.Split(',');
@@ -44,14 +54,16 @@ namespace SecretSharing.ProfilerRunner.Models
 
        public int GetLongestLength()
         {
-            return Accesses.Max(po => po.Parties.Count);
+            return Accesses.Max(po => po.getPartiesCount());
         }
        public static bool IsQualifiedSubset(QualifiedSubset subsetToTest, AccessStructure miniamlAccess)
        {
            foreach (var qualifiedSet in miniamlAccess.Accesses)
            {
+               if (!(qualifiedSet is QualifiedSubset)) continue;
                HashSet<int> a = new HashSet<int>(subsetToTest.Parties.Select(x => x.GetPartyId()));
-               HashSet<int> b = new HashSet<int>(qualifiedSet.Parties.Select(x => x.GetPartyId()));
+               var qs = (QualifiedSubset)qualifiedSet;
+               HashSet<int> b = new HashSet<int>(qs.Parties.Select(x => x.GetPartyId()));
 
                if (b.IsProperSubsetOf(a) || b.IsSubsetOf(a)) return true;
            }
@@ -80,5 +92,10 @@ namespace SecretSharing.ProfilerRunner.Models
            return result;
        }
 
+       public override string ToString()
+       {
+           var re = Accesses.Select(po => po.ToString()).Aggregate((current, next) => current + "∨" + next);
+           return re;
+       }
     }
 }
