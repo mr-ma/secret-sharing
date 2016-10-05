@@ -1,7 +1,8 @@
 # secret-sharing
 Secret Sharing Algorithms implemented in .net
-In this library, most promising secret sharing crypto algorithms are implmeneted in C++/Cli .net
+In this library, the most promising secret sharing crypto algorithms are implmeneted in C++/Cli .net
 Currently, schemes: Shamir, Benaloh-Leichter Generalized Access Structure, and Schoenmakers PVSS are implemented.
+Additionally, Chaum-Peterson non-interactive zero knowledge protocol was implemented.
 
 You can cite Secret Sharing Lib using the following Bibtex entry:
 ```
